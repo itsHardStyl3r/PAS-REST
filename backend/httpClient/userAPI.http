@@ -1,0 +1,34 @@
+### Home
+GET localhost:8080
+
+### getUserByUsername
+GET localhost:8080/api/v1/user/username/anna
+
+### getUserById
+GET localhost:8080/api/v1/user/id/1
+
+### getUsers
+GET localhost:8080/api/v1/users
+
+### createUser
+POST https://examples.http-client.intellij.net/post
+Content-Type: application/json
+
+{
+  "id": 4,
+  "username": "nowy",
+  "name": "Nowy",
+  "active": false
+}
+
+### deleteUser
+DELETE localhost:8080/api/v1/user/id/4
+
+### activate (User)
+PATCH localhost:8080/api/v1/user/id/2/activate
+
+### deactivate (User)
+PATCH localhost:8080/api/v1/user/id/2/activate
+
+### Search users by name
+GET localhost:8080/api/v1/user/search/

@@ -1,4 +1,4 @@
-package pl.hardstyl3r.pas.controllers;
+package pl.hardstyl3r.pas.v1.controller;
 
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
