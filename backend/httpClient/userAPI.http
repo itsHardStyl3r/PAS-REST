@@ -31,4 +31,12 @@ PATCH localhost:8080/api/v1/user/id/2/activate
 PATCH localhost:8080/api/v1/user/id/2/activate
 
 ### Search users by name
-GET localhost:8080/api/v1/user/search/
+GET localhost:8080/api/v1/user/search/e
+
+### Rename user
+PATCH localhost:8080/api/v1/user/id/3/rename
+Content-Type: application/json
+
+{
+  "name": "NowaNazwa"
+}

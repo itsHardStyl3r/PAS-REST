@@ -2,6 +2,10 @@ package pl.hardstyl3r.pas.v1.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import pl.hardstyl3r.pas.v1.dto.CreateUserDTO;
+import pl.hardstyl3r.pas.v1.dto.EditUserDTO;
+import pl.hardstyl3r.pas.v1.dto.UserConverter;
+import pl.hardstyl3r.pas.v1.dto.UserDTO;
 import pl.hardstyl3r.pas.v1.objects.User;
 import pl.hardstyl3r.pas.v1.services.UserService;
 
@@ -20,24 +24,30 @@ public class UserController {
     }
 
     @GetMapping("/user/id/{id}")
-    public User getUserById(@PathVariable Integer id) {
+    public UserDTO getUserById(@PathVariable Integer id) {
         Optional<User> user = userService.findUserById(id);
-        return user.orElse(null);
+        return user.map(UserConverter::dtoFromUser).orElse(null);
     }
 
     @GetMapping("/user/username/{username}")
-    public User getUserByName(@PathVariable String username) {
+    public UserDTO getUserByName(@PathVariable String username) {
         Optional<User> user = userService.findUserByUsername(username);
-        return user.orElse(null);
+        return user.map(UserConverter::dtoFromUser).orElse(null);
     }
 
     @GetMapping("/users")
-    public List<User> getUsers() {
-        return userService.findAll();
+    public List<UserDTO> getUsers() {
+        return UserConverter.dtoFromUsers(userService.findAll());
     }
 
     @PostMapping("/user")
-    public void createUser(@RequestBody User user) {
+    public void createUser(@RequestBody CreateUserDTO userDTO) {
+        User user = new User(
+                (userService.findAll().isEmpty() ? 1 : userService.findAll().size() + 1),
+                userDTO.username(),
+                userDTO.name(),
+                userDTO.active()
+        );
         userService.insertUser(user);
     }
 
@@ -60,5 +70,10 @@ public class UserController {
     @GetMapping("/user/search/{search}")
     public List<User> searchForUser(@PathVariable String search) {
         return userService.searchForUsersByUsername(search);
+    }
+
+    @PatchMapping("/user/id/{id}/rename")
+    public void renameUser(@PathVariable Integer id, @RequestBody EditUserDTO userDTO) {
+        userService.renameUserById(id, userDTO.name());
     }
 }

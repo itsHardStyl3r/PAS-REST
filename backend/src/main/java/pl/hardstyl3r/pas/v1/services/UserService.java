@@ -41,7 +41,6 @@ public class UserService {
     }
 
     public void insertUser(User user) {
-        if (users.contains(user)) return;
         users.add(user);
     }
 
@@ -57,5 +56,11 @@ public class UserService {
 
     public List<User> searchForUsersByUsername(String search) {
         return users.stream().filter(user -> user.getUsername().toLowerCase().contains(search.toLowerCase())).toList();
+    }
+
+    public void renameUserById(Integer id, String newName) {
+        Optional<User> user = findUserById(id);
+        if (user.isEmpty()) return;
+        user.get().setName(newName);
     }
 }
