@@ -1,0 +1,50 @@
+### Pobierz wszystkie zasoby (getAllResources)
+GET http://localhost:8080/api/v1/resources
+
+### Pobierz zasób po ID (getResourceById)
+GET http://localhost:8080/api/v1/resources/60c72b2f9b1e8a3f3c8e4b2a
+
+### Utwórz nową książkę (createResource - Book)
+POST http://localhost:8080/api/v1/resources
+Content-Type: application/json
+
+{
+  "type": "book",
+  "name": "Morderstwo w Orient Expressie",
+  "description": "Herkules Poirot po rozwiązaniu sprawy kryminalnej w Azji wraca do Europy.",
+  "author": "Agatha Christie",
+  "isbn": "9788327159779"
+}
+
+### Utwórz nowe czasopismo (createResource - Periodical)
+POST http://localhost:8080/api/v1/resources
+Content-Type: application/json
+
+{
+  "type": "periodical",
+  "name": "CD-Action",
+  "description": "Magazyn o grach komputerowych",
+  "issueNumber": 320
+}
+
+### Utwórz nową gazetę (createResource - Newspaper)
+POST http://localhost:8080/api/v1/resources
+Content-Type: application/json
+
+{
+  "type": "newspaper",
+  "name": "Gazeta Wyborcza",
+  "description": "Gazeta",
+  "releaseDate": "15-11-2025"
+}
+
+### Edytuj zasób (editResource)
+PUT http://localhost:8080/api/v1/resources/60c72b2f9b1e8a3f3c8e4b2d
+Content-Type: application/json
+
+{
+  "releaseDate": "15-11-2026"
+}
+
+### Usuń zasób po ID (deleteResource) #wpisz-id
+DELETE http://localhost:8080/api/v1/resources/----
