@@ -1,39 +1,38 @@
 ### Home
 GET localhost:8080
 
-### getUserByUsername
+### Pobierz użytkownika po username (getUserByUsername)
 GET localhost:8080/api/v1/user/username/anna
 
-### getUserById
+### Pobierz użytkownika po ID (getUserById)
 GET localhost:8080/api/v1/user/id/1
 
-### getUsers
+### Pobierz wszystkich użytkowników (getUsers)
 GET localhost:8080/api/v1/users
 
-### createUser
-POST https://examples.http-client.intellij.net/post
+### Utwórz nowego użytkownika CreateUserDTO (createUser)
+POST http://localhost:8080/api/v1/user
 Content-Type: application/json
 
 {
-  "id": 4,
   "username": "nowy",
   "name": "Nowy",
   "active": false
 }
 
-### deleteUser
+### Usuń użytkowników po ID (deleteUser)
 DELETE localhost:8080/api/v1/user/id/4
 
-### activate (User)
+### Aktywuj użytkownika
 PATCH localhost:8080/api/v1/user/id/2/activate
 
-### deactivate (User)
-PATCH localhost:8080/api/v1/user/id/2/activate
+### Dezaktywuj użytkownika
+PATCH localhost:8080/api/v1/user/id/2/deactivate
 
-### Search users by name
+### Wyszukaj użytkowników po fragmencie nazwy (searchUsers)
 GET localhost:8080/api/v1/user/search/e
 
-### Rename user
+### Zmień nazwę użytkownika (rename)
 PATCH localhost:8080/api/v1/user/id/3/rename
 Content-Type: application/json
 

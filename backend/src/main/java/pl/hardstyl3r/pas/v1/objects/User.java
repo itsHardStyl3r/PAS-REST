@@ -1,34 +1,29 @@
 package pl.hardstyl3r.pas.v1.objects;
 
 public class User {
-
-    private int id;
+    private String id;
     private String username;
     private String name;
     private boolean active;
 
-    public User() {
-    }
-
-    public User(int id, String username, String name) {
-        this.id = id;
+    public User(String username, String name, boolean active) {
         this.username = username;
         this.name = name;
-        this.active = true;
+        this.active = active;
     }
 
-    public User(int id, String username, String name, boolean active) {
+    public User(String id, String username, String name, boolean active) {
         this.id = id;
         this.username = username;
         this.name = name;
         this.active = active;
     }
 
-    public int getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(String id) {
         this.id = id;
     }
 

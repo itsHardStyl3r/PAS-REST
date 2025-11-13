@@ -1,7 +1,7 @@
 package pl.hardstyl3r.pas.v1.dto;
 
-public record UserDTO(Integer id, String username, String name, boolean active) {
-    public UserDTO(Integer id, String username, String name, boolean active) {
+public record UserDTO(String id, String username, String name, boolean active) {
+    public UserDTO(String id, String username, String name, boolean active) {
         this.id = id;
         this.username = username;
         this.name = name;
@@ -13,7 +13,7 @@ public record UserDTO(Integer id, String username, String name, boolean active) 
         return "UserDTO{id=" + id + ", username='" + username + "', name='" + name + "', active=" + active + "}";
     }
 
-    public Integer id() {
+    public String id() {
         return id;
     }
 
