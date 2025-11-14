@@ -1,10 +1,18 @@
 package pl.hardstyl3r.pas.v1.objects;
 
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
+
+@Document(collection = "#{@environment.getProperty('pas.mongodb.collection.users')}")
 public class User {
+    @Id
     private String id;
     private String username;
     private String name;
     private boolean active;
+
+    protected User() {
+    }
 
     public User(String username, String name, boolean active) {
         this.username = username;

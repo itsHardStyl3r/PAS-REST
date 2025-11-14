@@ -2,10 +2,10 @@
 GET localhost:8080
 
 ### Pobierz użytkownika po username (getUserByUsername)
-GET localhost:8080/api/v1/user/username/anna
+GET localhost:8080/api/v1/user/username/ewisniewska
 
 ### Pobierz użytkownika po ID (getUserById)
-GET localhost:8080/api/v1/user/id/1
+GET localhost:8080/api/v1/user/id/60c72b2f9b1e8a3f3c8e4b1a
 
 ### Pobierz wszystkich użytkowników (getUsers)
 GET localhost:8080/api/v1/users
@@ -20,20 +20,20 @@ Content-Type: application/json
   "active": false
 }
 
-### Usuń użytkowników po ID (deleteUser)
-DELETE localhost:8080/api/v1/user/id/4
+### Usuń użytkowników po ID (deleteUser) #wpisz-id
+DELETE localhost:8080/api/v1/user/id/----
 
 ### Aktywuj użytkownika
-PATCH localhost:8080/api/v1/user/id/2/activate
+PATCH localhost:8080/api/v1/user/id/60c72b2f9b1e8a3f3c8e4b1b/activate
 
 ### Dezaktywuj użytkownika
-PATCH localhost:8080/api/v1/user/id/2/deactivate
+PATCH localhost:8080/api/v1/user/id/60c72b2f9b1e8a3f3c8e4b1b/deactivate
 
 ### Wyszukaj użytkowników po fragmencie nazwy (searchUsers)
 GET localhost:8080/api/v1/user/search/e
 
 ### Zmień nazwę użytkownika (rename)
-PATCH localhost:8080/api/v1/user/id/3/rename
+PATCH localhost:8080/api/v1/user/id/60c72b2f9b1e8a3f3c8e4b1b/rename
 Content-Type: application/json
 
 {

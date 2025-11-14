@@ -51,11 +51,11 @@ public class MongoInit implements CommandLineRunner {
 
         // https://www.fakenamegenerator.com/gen-random-pl-pl.php
         List<Document> users = Arrays.asList(
-                new Document("username", "rwalczak").append("name", "Rafał Walczak").append("active", false),
-                new Document("username", "ewisniewska").append("name", "Edyta Wiśniewska").append("active", true),
-                new Document("username", "zchmielewska").append("name", "Zofia Chmielewska").append("active", true),
-                new Document("username", "ksawicka").append("name", "Kinga Sawicka").append("active", true),
-                new Document("username", "mzawadzki").append("name", "Mieczysław Zawadzki").append("active", false)
+                new Document("_id", new ObjectId("60c72b2f9b1e8a3f3c8e4b1a")).append("username", "rwalczak").append("name", "Rafał Walczak").append("active", false),
+                new Document("_id", new ObjectId("60c72b2f9b1e8a3f3c8e4b1b")).append("username", "ewisniewska").append("name", "Edyta Wiśniewska").append("active", true),
+                new Document("_id", new ObjectId("60c72b2f9b1e8a3f3c8e4b1c")).append("username", "zchmielewska").append("name", "Zofia Chmielewska").append("active", true),
+                new Document("_id", new ObjectId("60c72b2f9b1e8a3f3c8e4b1d")).append("username", "ksawicka").append("name", "Kinga Sawicka").append("active", true),
+                new Document("_id", new ObjectId("60c72b2f9b1e8a3f3c8e4b1e")).append("username", "mzawadzki").append("name", "Mieczysław Zawadzki").append("active", false)
         );
 
         usersCollection.insertMany(users);
