@@ -3,12 +3,11 @@ package pl.hardstyl3r.pas.v1.services;
 import org.springframework.stereotype.Service;
 import pl.hardstyl3r.pas.v1.dto.CreateResourceDTO;
 import pl.hardstyl3r.pas.v1.dto.EditResourceDTO;
+import pl.hardstyl3r.pas.v1.exceptions.ResourceInUseException;
 import pl.hardstyl3r.pas.v1.exceptions.ResourceNotFoundException;
 import pl.hardstyl3r.pas.v1.exceptions.ResourceValidationException;
-import pl.hardstyl3r.pas.v1.objects.resources.Book;
-import pl.hardstyl3r.pas.v1.objects.resources.Newspaper;
-import pl.hardstyl3r.pas.v1.objects.resources.Periodical;
-import pl.hardstyl3r.pas.v1.objects.resources.Resource;
+import pl.hardstyl3r.pas.v1.objects.resources.*;
+import pl.hardstyl3r.pas.v1.repositories.AllocationRepository;
 import pl.hardstyl3r.pas.v1.repositories.ResourceRepository;
 
 import java.util.List;
@@ -17,9 +16,11 @@ import java.util.Optional;
 @Service
 public class ResourceService {
     private final ResourceRepository resourceRepository;
+    private final AllocationRepository allocationRepository;
 
-    public ResourceService(ResourceRepository resourceRepository) {
+    public ResourceService(ResourceRepository resourceRepository, AllocationRepository allocationRepository) {
         this.resourceRepository = resourceRepository;
+        this.allocationRepository = allocationRepository;
     }
 
     public List<Resource> findAll() {
@@ -62,6 +63,12 @@ public class ResourceService {
     }
 
     public void deleteById(String id) {
+        if (!resourceRepository.existsById(id)) {
+            throw new ResourceNotFoundException("Resource with id " + id + " not found.");
+        }
+        if (!allocationRepository.findByResourceId(id).isEmpty()) {
+            throw new ResourceInUseException("Cannot delete resource with id " + id + " because it is associated with an allocation.");
+        }
         resourceRepository.deleteById(id);
     }
 

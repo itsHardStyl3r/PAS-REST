@@ -42,4 +42,11 @@ public class ResourceRepository {
         }
     }
 
+    public boolean existsById(String id) {
+        if (!ObjectId.isValid(id)) {
+            return false;
+        }
+        Query query = new Query(Criteria.where("_id").is(id));
+        return mongoTemplate.exists(query, Resource.class);
+    }
 }
