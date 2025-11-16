@@ -1,39 +1,56 @@
+### Zaloguj się jako admin i zapisz token
+POST localhost:8080/api/auth/login
+Content-Type: application/json
+
+{
+  "username": "admin",
+  "password": "password"
+}
+
 ### Home
 GET localhost:8080
 
 ### Pobierz użytkownika po username (getUserByUsername)
-GET localhost:8080/api/v1/user/username/ewisniewska
+GET localhost:8080/api/v1/user/username/rwalczak
+Authorization: Bearer {{admin_token}}
 
 ### Pobierz użytkownika po ID (getUserById)
 GET localhost:8080/api/v1/user/id/60c72b2f9b1e8a3f3c8e4b1a
+Authorization: Bearer {{admin_token}}
 
 ### Pobierz wszystkich użytkowników (getUsers)
 GET localhost:8080/api/v1/users
+Authorization: Bearer {{admin_token}}
 
-### Utwórz nowego użytkownika CreateUserDTO (createUser)
-POST http://localhost:8080/api/v1/user
+### Utwórz nowego użytkownika (createUser)
+POST localhost:8080/api/auth/register
 Content-Type: application/json
 
 {
   "username": "nowy",
-  "name": "Nowy",
-  "active": false
+  "name": "Nowy Użytkownik",
+  "password": "password123"
 }
 
 ### Usuń użytkowników po ID (deleteUser) #wpisz-id
 DELETE localhost:8080/api/v1/user/id/----
+Authorization: Bearer {{admin_token}}
 
 ### Aktywuj użytkownika
 PATCH localhost:8080/api/v1/user/id/60c72b2f9b1e8a3f3c8e4b1b/activate
+Authorization: Bearer {{admin_token}}
 
 ### Dezaktywuj użytkownika
 PATCH localhost:8080/api/v1/user/id/60c72b2f9b1e8a3f3c8e4b1b/deactivate
+Authorization: Bearer {{admin_token}}
 
 ### Wyszukaj użytkowników po fragmencie nazwy (searchUsers)
 GET localhost:8080/api/v1/user/search/e
+Authorization: Bearer {{admin_token}}
 
 ### Zmień nazwę użytkownika (rename)
 PATCH localhost:8080/api/v1/user/id/60c72b2f9b1e8a3f3c8e4b1b/rename
+Authorization: Bearer {{admin_token}}
 Content-Type: application/json
 
 {
