@@ -49,9 +49,6 @@ public class UserController {
     @DeleteMapping("/user/id/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public void deleteUser(@PathVariable String id) {
-        if (userService.findUserById(id).isEmpty()) {
-            throw new UserNotFoundException("User with id " + id + " not found");
-        }
         userService.deleteUserById(id);
     }
 
