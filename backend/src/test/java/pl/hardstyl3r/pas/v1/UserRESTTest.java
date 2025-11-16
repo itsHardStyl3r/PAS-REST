@@ -160,4 +160,16 @@ class UserRESTTest {
                 .then()
                 .statusCode(403);
     }
+
+    @Test
+    void shouldFailToRegisterUserWithExistingUsername() {
+        RegisterRequest existingUser = new RegisterRequest("anna", "newpassword123", "Inna Anna");
+        given()
+                .contentType(ContentType.JSON)
+                .body(existingUser)
+                .when()
+                .post("/api/auth/register")
+                .then()
+                .statusCode(409);
+    }
 }
