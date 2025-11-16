@@ -35,18 +35,36 @@ public class ResourceService {
         if (dto.name() == null || dto.name().isBlank()) {
             throw new ResourceValidationException("Resource name cannot be blank.");
         }
+        if (dto.name().length() < 3 || dto.name().length() > 100) {
+            throw new ResourceValidationException("Resource name must be between 3 and 100 characters.");
+        }
+        if (dto.description() == null || dto.description().isBlank()) {
+            throw new ResourceValidationException("Resource name cannot be blank.");
+        }
+        if (dto.description().length() < 3 || dto.description().length() > 255) {
+            throw new ResourceValidationException("Resource description must be between 3 and 200 characters.");
+        }
 
         Resource resource;
         switch (dto.type().toLowerCase()) {
             case "book":
-                if (dto.author() == null || dto.author().isBlank() || dto.isbn() == null || dto.isbn().isBlank()) {
-                    throw new ResourceValidationException("Author and ISBN are required for a book.");
+                if (dto.author() == null || dto.author().isBlank()) {
+                    throw new ResourceValidationException("Author is required for a book.");
+                }
+                if (dto.author().length() < 3 || dto.author().length() > 50) {
+                    throw new ResourceValidationException("Author name must be between 3 and 50 characters.");
+                }
+                if (dto.isbn() == null || dto.isbn().isBlank()) {
+                    throw new ResourceValidationException("ISBN is required for a book.");
                 }
                 resource = new Book(dto.name(), dto.description(), dto.author(), dto.isbn());
                 break;
             case "periodical":
                 if (dto.issueNumber() == null) {
                     throw new ResourceValidationException("Issue number is required for a periodical.");
+                }
+                if (dto.issueNumber() <= 0) {
+                    throw new ResourceValidationException("Issue number must be a positive number.");
                 }
                 resource = new Periodical(dto.name(), dto.description(), dto.issueNumber());
                 break;
@@ -79,18 +97,36 @@ public class ResourceService {
         if (dto.name() == null || dto.name().isBlank()) {
             throw new ResourceValidationException("Resource name cannot be blank.");
         }
+        if (dto.name().length() < 3 || dto.name().length() > 100) {
+            throw new ResourceValidationException("Resource name must be between 3 and 100 characters.");
+        }
+        if (dto.description() == null || dto.description().isBlank()) {
+            throw new ResourceValidationException("Resource name cannot be blank.");
+        }
+        if (dto.description().length() < 3 || dto.description().length() > 255) {
+            throw new ResourceValidationException("Resource description must be between 3 and 200 characters.");
+        }
         resource.setName(dto.name());
         resource.setDescription(dto.description());
 
         if (resource instanceof Book book) {
-            if (dto.author() == null || dto.author().isBlank() || dto.isbn() == null || dto.isbn().isBlank()) {
-                throw new ResourceValidationException("Author and ISBN are required for a book.");
+            if (dto.author() == null || dto.author().isBlank()) {
+                throw new ResourceValidationException("Author is required for a book.");
+            }
+            if (dto.author().length() < 3 || dto.author().length() > 50) {
+                throw new ResourceValidationException("Author name must be between 3 and 50 characters.");
+            }
+            if (dto.isbn() == null || dto.isbn().isBlank()) {
+                throw new ResourceValidationException("ISBN is required for a book.");
             }
             book.setAuthor(dto.author());
             book.setIsbn(dto.isbn());
         } else if (resource instanceof Periodical periodical) {
             if (dto.issueNumber() == null) {
                 throw new ResourceValidationException("Issue number is required for a periodical.");
+            }
+            if (dto.issueNumber() <= 0) {
+                throw new ResourceValidationException("Issue number must be a positive number.");
             }
             periodical.setIssueNumber(dto.issueNumber());
         } else if (resource instanceof Newspaper newspaper) {

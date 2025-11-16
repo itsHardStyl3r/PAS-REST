@@ -1,10 +1,7 @@
 package pl.hardstyl3r.pas.v1.services;
 
 import org.springframework.stereotype.Service;
-import pl.hardstyl3r.pas.v1.exceptions.AllocationException;
-import pl.hardstyl3r.pas.v1.exceptions.ResourceInUseException;
-import pl.hardstyl3r.pas.v1.exceptions.ResourceNotFoundException;
-import pl.hardstyl3r.pas.v1.exceptions.UserNotFoundException;
+import pl.hardstyl3r.pas.v1.exceptions.*;
 import pl.hardstyl3r.pas.v1.objects.Allocation;
 import pl.hardstyl3r.pas.v1.objects.User;
 import pl.hardstyl3r.pas.v1.repositories.AllocationRepository;
@@ -38,6 +35,13 @@ public class AllocationService {
     }
 
     public Allocation createAllocation(String userId, String resourceId) {
+        if (userId == null || userId.isBlank()) {
+            throw new AllocationException("User ID cannot be blank.");
+        }
+        if (resourceId == null || resourceId.isBlank()) {
+            throw new AllocationException("Resource ID cannot be blank.");
+        }
+
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException("User with id " + userId + " not found."));
 
@@ -57,6 +61,9 @@ public class AllocationService {
     }
 
     public Allocation endAllocation(String id) {
+        if (id == null || id.isBlank()) {
+            throw new AllocationException("Allocation ID cannot be blank.");
+        }
         Allocation allocation = allocationRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Allocation with id " + id + " not found."));
 
@@ -69,6 +76,9 @@ public class AllocationService {
     }
 
     public void deleteById(String id) {
+        if (id == null || id.isBlank()) {
+            throw new AllocationException("Allocation ID cannot be blank.");
+        }
         Allocation allocation = allocationRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Allocation with id " + id + " not found."));
 
@@ -79,24 +89,36 @@ public class AllocationService {
     }
 
     public List<Allocation> getCurrentAllocationsForUser(String userId) {
+        if (userId == null || userId.isBlank()) {
+            throw new AllocationException("User ID cannot be blank.");
+        }
         return allocationRepository.findByUserId(userId).stream()
                 .filter(a -> a.getEndTime() == null)
                 .collect(Collectors.toList());
     }
 
     public List<Allocation> getPastAllocationsForUser(String userId) {
+        if (userId == null || userId.isBlank()) {
+            throw new AllocationException("User ID cannot be blank.");
+        }
         return allocationRepository.findByUserId(userId).stream()
                 .filter(a -> a.getEndTime() != null)
                 .collect(Collectors.toList());
     }
 
     public List<Allocation> getCurrentAllocationsForResource(String resourceId) {
+        if (resourceId == null || resourceId.isBlank()) {
+            throw new AllocationException("Resource ID cannot be blank.");
+        }
         return allocationRepository.findByResourceId(resourceId).stream()
                 .filter(a -> a.getEndTime() == null)
                 .collect(Collectors.toList());
     }
 
     public List<Allocation> getPastAllocationsForResource(String resourceId) {
+        if (resourceId == null || resourceId.isBlank()) {
+            throw new AllocationException("Resource ID cannot be blank.");
+        }
         return allocationRepository.findByResourceId(resourceId).stream()
                 .filter(a -> a.getEndTime() != null)
                 .collect(Collectors.toList());
