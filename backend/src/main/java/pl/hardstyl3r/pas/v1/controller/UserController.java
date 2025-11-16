@@ -5,12 +5,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import pl.hardstyl3r.pas.v1.dto.EditUserDTO;
-import pl.hardstyl3r.pas.v1.dto.RegisterRequest;
 import pl.hardstyl3r.pas.v1.dto.UserConverter;
 import pl.hardstyl3r.pas.v1.dto.UserDTO;
 import pl.hardstyl3r.pas.v1.exceptions.UserNotFoundException;
 import pl.hardstyl3r.pas.v1.exceptions.UserValidationException;
-import pl.hardstyl3r.pas.v1.objects.User;
 import pl.hardstyl3r.pas.v1.objects.UserRole;
 import pl.hardstyl3r.pas.v1.services.UserService;
 
@@ -94,7 +92,7 @@ public class UserController {
             userService.changeUserRole(id, newRole);
             return ResponseEntity.ok("User role updated successfully.");
         } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body("Invalid role specified.");
+            throw new UserValidationException("Invalid role: " + role);
         }
     }
 }
