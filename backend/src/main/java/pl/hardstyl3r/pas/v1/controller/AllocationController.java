@@ -1,6 +1,7 @@
 package pl.hardstyl3r.pas.v1.controller;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import pl.hardstyl3r.pas.v1.exceptions.ResourceNotFoundException;
 import pl.hardstyl3r.pas.v1.objects.Allocation;
@@ -25,12 +26,14 @@ public class AllocationController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'RESOURCE_MANAGER')")
     public Allocation getAllocationById(@PathVariable String id) {
         return allocationService.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Allocation with id " + id + " not found."));
     }
 
     @PostMapping
+    @PreAuthorize("hasAnyRole('ADMIN', 'RESOURCE_MANAGER')")
     public ResponseEntity<Allocation> createAllocation(@RequestBody Map<String, String> payload) {
         String userId = payload.get("userId");
         String resourceId = payload.get("resourceId");
@@ -39,12 +42,14 @@ public class AllocationController {
     }
 
     @PostMapping("/{id}/end")
+    @PreAuthorize("hasAnyRole('ADMIN', 'RESOURCE_MANAGER')")
     public ResponseEntity<Allocation> endAllocation(@PathVariable String id) {
         Allocation endedAllocation = allocationService.endAllocation(id);
         return ResponseEntity.ok(endedAllocation);
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'RESOURCE_MANAGER')")
     public ResponseEntity<Void> deleteAllocation(@PathVariable String id) {
         allocationService.deleteById(id);
         return ResponseEntity.noContent().build();
@@ -61,11 +66,13 @@ public class AllocationController {
     }
 
     @GetMapping("/resource/{resourceId}/current")
+    @PreAuthorize("hasAnyRole('ADMIN', 'RESOURCE_MANAGER')")
     public List<Allocation> getCurrentAllocationsForResource(@PathVariable String resourceId) {
         return allocationService.getCurrentAllocationsForResource(resourceId);
     }
 
     @GetMapping("/resource/{resourceId}/past")
+    @PreAuthorize("hasAnyRole('ADMIN', 'RESOURCE_MANAGER')")
     public List<Allocation> getPastAllocationsForResource(@PathVariable String resourceId) {
         return allocationService.getPastAllocationsForResource(resourceId);
     }

@@ -9,20 +9,16 @@ public class User {
     private String id;
     private String username;
     private String name;
-    private boolean active;
+    private boolean active = false;
+    private UserRole role = UserRole.CLIENT;
+    private String password;
 
     protected User() {
     }
 
-    public User(String username, String name, boolean active) {
+    public User(String username, String password, String name, boolean active) {
         this.username = username;
-        this.name = name;
-        this.active = active;
-    }
-
-    public User(String id, String username, String name, boolean active) {
-        this.id = id;
-        this.username = username;
+        this.password = password;
         this.name = name;
         this.active = active;
     }
@@ -57,5 +53,21 @@ public class User {
 
     public void setActive(boolean active) {
         this.active = active;
+    }
+
+    public UserRole getRole() {
+        return role;
+    }
+
+    public void setRole(UserRole role) {
+        this.role = role;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 }

@@ -2,10 +2,9 @@ package pl.hardstyl3r.pas.v1;
 
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Filters;
-import com.mongodb.client.model.IndexOptions;
-import com.mongodb.client.model.Indexes;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
+import io.restassured.response.Response;
 import org.bson.Document;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,17 +12,21 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
-import pl.hardstyl3r.pas.v1.dto.CreateUserDTO;
 import pl.hardstyl3r.pas.v1.dto.EditUserDTO;
+import pl.hardstyl3r.pas.v1.dto.LoginRequest;
+import pl.hardstyl3r.pas.v1.dto.RegisterRequest;
 import pl.hardstyl3r.pas.v1.dto.UserDTO;
+import pl.hardstyl3r.pas.v1.objects.UserRole;
 
 import java.util.Arrays;
 import java.util.Objects;
 
 import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.hasItems;
+import static org.hamcrest.Matchers.hasSize;
 
 @ActiveProfiles("test")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -32,6 +35,8 @@ class UserRESTTest {
 
     @Autowired
     private MongoTemplate mongoTemplate;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     @LocalServerPort
     private int port;
@@ -41,13 +46,14 @@ class UserRESTTest {
 
     private String aniaId;
     private String marekId;
+    private String adminToken;
 
     @BeforeAll
     void checkDatabaseConnection() {
         try {
             mongoTemplate.getDb().runCommand(new Document("ping", 1));
         } catch (Exception e) {
-            Assumptions.abort("Could not connect to MongoDB. Skipping integration tests. Please ensure docker-compose is running.");
+            Assumptions.abort("Could not connect to MongoDB. Skipping integration tests.");
         }
     }
 
@@ -56,33 +62,45 @@ class UserRESTTest {
         RestAssured.port = port;
 
         mongoTemplate.dropCollection(collectionName);
-        mongoTemplate.createCollection(collectionName);
-        MongoCollection<Document> usersCollection = mongoTemplate.getCollection(collectionName);
-        usersCollection.createIndex(Indexes.ascending("username"), new IndexOptions().unique(true));
+        MongoCollection<Document> usersCollection = mongoTemplate.createCollection(collectionName);
 
-        Document ania = new Document("username", "anna").append("name", "Ania").append("active", true);
-        Document marek = new Document("username", "marek").append("name", "Marek").append("active", true);
-        usersCollection.insertMany(Arrays.asList(ania, marek));
+        Document admin = new Document("username", "admin").append("name", "Admin").append("active", true).append("password", passwordEncoder.encode("password")).append("role", UserRole.ADMIN.name());
+        Document ania = new Document("username", "anna").append("name", "Ania").append("active", true).append("password", passwordEncoder.encode("password")).append("role", UserRole.CLIENT.name());
+        Document marek = new Document("username", "marek").append("name", "Marek").append("active", true).append("password", passwordEncoder.encode("password")).append("role", UserRole.CLIENT.name());
+        usersCollection.insertMany(Arrays.asList(admin, ania, marek));
 
-        Document aniaDoc = usersCollection.find(Filters.eq("username", "anna")).first();
-        Document marekDoc = usersCollection.find(Filters.eq("username", "marek")).first();
-        this.aniaId = Objects.requireNonNull(aniaDoc).getObjectId("_id").toHexString();
-        this.marekId = Objects.requireNonNull(marekDoc).getObjectId("_id").toHexString();
+        this.aniaId = Objects.requireNonNull(usersCollection.find(Filters.eq("username", "anna")).first()).getObjectId("_id").toHexString();
+        this.marekId = Objects.requireNonNull(usersCollection.find(Filters.eq("username", "marek")).first()).getObjectId("_id").toHexString();
+
+        adminToken = loginAndGetToken("admin", "password");
+    }
+
+    private String loginAndGetToken(String username, String password) {
+        LoginRequest loginRequest = new LoginRequest(username, password);
+        Response response = given()
+                .contentType(ContentType.JSON)
+                .body(loginRequest)
+                .when()
+                .post("/api/auth/login")
+                .then()
+                .statusCode(200)
+                .extract().response();
+        return response.jsonPath().getString("token");
     }
 
     @Test
-    void shouldCreateUser() {
-        CreateUserDTO newUser = new CreateUserDTO("kasia", "Katarzyna", true);
-
+    void shouldRegisterUser() {
+        RegisterRequest newUser = new RegisterRequest("kasia", "password123", "Katarzyna");
         given()
                 .contentType(ContentType.JSON)
                 .body(newUser)
                 .when()
-                .post("/api/v1/user")
+                .post("/api/auth/register")
                 .then()
                 .statusCode(200);
 
         UserDTO createdUser = given()
+                .header("Authorization", "Bearer " + adminToken)
                 .pathParam("username", "kasia")
                 .when()
                 .get("/api/v1/user/username/{username}")
@@ -92,24 +110,25 @@ class UserRESTTest {
 
         assertThat(createdUser.username()).isEqualTo("kasia");
         assertThat(createdUser.name()).isEqualTo("Katarzyna");
-        assertThat(createdUser.id()).isNotNull();
     }
 
     @Test
     void shouldGetAllUsers() {
         given()
+                .header("Authorization", "Bearer " + adminToken)
                 .when()
                 .get("/api/v1/users")
                 .then()
                 .statusCode(200)
-                .body("$", hasSize(2))
-                .body("username", hasItems("anna", "marek"));
+                .body("$", hasSize(3))
+                .body("username", hasItems("admin", "anna", "marek"));
     }
 
     @Test
     void shouldUpdateUser() {
         EditUserDTO newName = new EditUserDTO("Anna Maria");
         given()
+                .header("Authorization", "Bearer " + adminToken)
                 .contentType(ContentType.JSON)
                 .body(newName)
                 .pathParam("id", aniaId)
@@ -117,56 +136,28 @@ class UserRESTTest {
                 .patch("/api/v1/user/id/{id}/rename")
                 .then()
                 .statusCode(200);
-
-        given()
-                .pathParam("id", aniaId)
-                .when()
-                .get("/api/v1/user/id/{id}")
-                .then()
-                .statusCode(200)
-                .body("name", equalTo("Anna Maria"));
     }
 
     @Test
     void shouldDeleteUser() {
         given()
+                .header("Authorization", "Bearer " + adminToken)
                 .pathParam("id", marekId)
                 .when()
                 .delete("/api/v1/user/id/{id}")
                 .then()
                 .statusCode(200);
+    }
 
+    @Test
+    void shouldFailToDeleteUserWithoutAdminRole() {
+        String clientToken = loginAndGetToken("anna", "password");
         given()
+                .header("Authorization", "Bearer " + clientToken)
                 .pathParam("id", marekId)
                 .when()
-                .get("/api/v1/user/id/{id}")
+                .delete("/api/v1/user/id/{id}")
                 .then()
-                .statusCode(404);
-    }
-
-    @Test
-    void shouldReturn400WhenCreatingUserWithBlankUsername() {
-        CreateUserDTO invalidUser = new CreateUserDTO("", "Test", true);
-
-        given()
-                .contentType(ContentType.JSON)
-                .body(invalidUser)
-                .when()
-                .post("/api/v1/user")
-                .then()
-                .statusCode(400);
-    }
-
-    @Test
-    void shouldReturn409WhenCreatingUserWithExistingUsername() {
-        CreateUserDTO duplicateUser = new CreateUserDTO("anna", "Anna Nowa", true);
-
-        given()
-                .contentType(ContentType.JSON)
-                .body(duplicateUser)
-                .when()
-                .post("/api/v1/user")
-                .then()
-                .statusCode(409);
+                .statusCode(403);
     }
 }

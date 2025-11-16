@@ -1,6 +1,7 @@
 package pl.hardstyl3r.pas.v1.controller;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import pl.hardstyl3r.pas.v1.dto.CreateResourceDTO;
 import pl.hardstyl3r.pas.v1.dto.EditResourceDTO;
@@ -32,18 +33,21 @@ public class ResourceController {
     }
 
     @PostMapping
+    @PreAuthorize("hasAnyRole('ADMIN', 'RESOURCE_MANAGER')")
     public ResponseEntity<Resource> createResource(@RequestBody CreateResourceDTO createResourceDTO) {
         Resource createdResource = resourceService.createResource(createResourceDTO);
         return ResponseEntity.ok(createdResource);
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'RESOURCE_MANAGER')")
     public ResponseEntity<Resource> editResource(@PathVariable String id, @RequestBody EditResourceDTO editResourceDTO) {
         Resource editedResource = resourceService.updateResource(id, editResourceDTO);
         return ResponseEntity.ok(editedResource);
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'RESOURCE_MANAGER')")
     public ResponseEntity<Void> deleteResource(@PathVariable String id) {
         resourceService.deleteById(id);
         return ResponseEntity.noContent().build();

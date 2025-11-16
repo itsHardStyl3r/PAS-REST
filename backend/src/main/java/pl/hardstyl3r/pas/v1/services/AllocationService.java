@@ -2,6 +2,7 @@ package pl.hardstyl3r.pas.v1.services;
 
 import org.springframework.stereotype.Service;
 import pl.hardstyl3r.pas.v1.exceptions.AllocationException;
+import pl.hardstyl3r.pas.v1.exceptions.ResourceInUseException;
 import pl.hardstyl3r.pas.v1.exceptions.ResourceNotFoundException;
 import pl.hardstyl3r.pas.v1.exceptions.UserNotFoundException;
 import pl.hardstyl3r.pas.v1.objects.Allocation;
@@ -48,7 +49,7 @@ public class AllocationService {
                 .orElseThrow(() -> new ResourceNotFoundException("Resource with id " + resourceId + " not found."));
 
         if (allocationRepository.existsByResourceIdAndEndTimeIsNull(resourceId)) {
-            throw new AllocationException("Cannot create allocation. Resource with id " + resourceId + " is already allocated.");
+            throw new ResourceInUseException("Cannot create allocation. Resource with id " + resourceId + " is already allocated.");
         }
 
         Allocation allocation = new Allocation(userId, resourceId);

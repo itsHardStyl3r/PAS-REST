@@ -2,6 +2,8 @@ package pl.hardstyl3r.pas.v1;
 
 import com.mongodb.client.MongoCollection;
 import io.restassured.RestAssured;
+import io.restassured.http.ContentType;
+import io.restassured.response.Response;
 import org.bson.Document;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,7 +11,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
+import pl.hardstyl3r.pas.v1.dto.LoginRequest;
+import pl.hardstyl3r.pas.v1.objects.UserRole;
 import pl.hardstyl3r.pas.v1.objects.resources.Book;
 
 import java.time.LocalDateTime;
@@ -24,6 +29,8 @@ class ResourceAllocationRESTTest {
 
     @Autowired
     private MongoTemplate mongoTemplate;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     @LocalServerPort
     private int port;
@@ -38,6 +45,7 @@ class ResourceAllocationRESTTest {
     private String userId;
     private String allocatedResourceId;
     private String unallocatedResourceId;
+    private String adminToken;
 
     @BeforeAll
     void checkDatabaseConnection() {
@@ -60,29 +68,38 @@ class ResourceAllocationRESTTest {
         MongoCollection<Document> resources = mongoTemplate.createCollection(resourcesCollectionName);
         MongoCollection<Document> allocations = mongoTemplate.createCollection(allocationsCollectionName);
 
-        // Setup User
-        Document user = new Document("username", "testUser").append("name", "Test User").append("active", true);
+        Document user = new Document("username", "adminUser").append("name", "Admin User").append("active", true).append("password", passwordEncoder.encode("password")).append("role", UserRole.ADMIN.name());
         users.insertOne(user);
         userId = user.getObjectId("_id").toHexString();
+        adminToken = loginAndGetToken("adminUser", "password");
 
-        // Setup Resources
         Document allocatedResource = new Document("_class", Book.class.getName()).append("name", "Allocated Book");
         Document unallocatedResource = new Document("_class", Book.class.getName()).append("name", "Unallocated Book");
         resources.insertMany(Arrays.asList(allocatedResource, unallocatedResource));
         allocatedResourceId = allocatedResource.getObjectId("_id").toHexString();
         unallocatedResourceId = unallocatedResource.getObjectId("_id").toHexString();
 
-        // Setup Allocation
-        Document allocation = new Document("userId", userId)
-                .append("resourceId", allocatedResourceId)
-                .append("startTime", LocalDateTime.now())
-                .append("endTime", null);
+        Document allocation = new Document("userId", userId).append("resourceId", allocatedResourceId).append("startTime", LocalDateTime.now()).append("endTime", null);
         allocations.insertOne(allocation);
+    }
+
+    private String loginAndGetToken(String username, String password) {
+        LoginRequest loginRequest = new LoginRequest(username, password);
+        Response response = given()
+                .contentType(ContentType.JSON)
+                .body(loginRequest)
+                .when()
+                .post("/api/auth/login")
+                .then()
+                .statusCode(200)
+                .extract().response();
+        return response.jsonPath().getString("token");
     }
 
     @Test
     void shouldFailToDeleteResourceWhenAllocated() {
         given()
+                .header("Authorization", "Bearer " + adminToken)
                 .pathParam("id", allocatedResourceId)
                 .when()
                 .delete("/api/v1/resources/{id}")
@@ -93,6 +110,7 @@ class ResourceAllocationRESTTest {
     @Test
     void shouldDeleteResourceWhenNotAllocated() {
         given()
+                .header("Authorization", "Bearer " + adminToken)
                 .pathParam("id", unallocatedResourceId)
                 .when()
                 .delete("/api/v1/resources/{id}")
