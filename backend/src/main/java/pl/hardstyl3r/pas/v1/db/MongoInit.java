@@ -1,8 +1,10 @@
 package pl.hardstyl3r.pas.v1.db;
 
 import com.mongodb.client.MongoCollection;
+import com.mongodb.client.model.CreateCollectionOptions;
 import com.mongodb.client.model.IndexOptions;
 import com.mongodb.client.model.Indexes;
+import com.mongodb.client.model.ValidationOptions;
 import org.bson.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -60,6 +62,23 @@ public class MongoInit implements CommandLineRunner {
 
     private void initUsers() {
         mongoTemplate.dropCollection(usersCollectionName);
+
+        Document schema = new Document("$jsonSchema", new Document("bsonType", "object")
+                .append("required", List.of("username", "name", "password", "role"))
+                .append("properties", new Document()
+                        .append("name", new Document()
+                                .append("bsonType", "string")
+                                .append("pattern", "^[\\S].*$")
+                                .append("description", "must be a non-blank string and is required"))
+                        .append("username", new Document()
+                                .append("bsonType", "string")
+                                .append("description", "must be a string and is required"))
+                ));
+
+        ValidationOptions validationOptions = new ValidationOptions().validator(schema);
+        CreateCollectionOptions createCollectionOptions = new CreateCollectionOptions().validationOptions(validationOptions);
+        mongoTemplate.getDb().createCollection(usersCollectionName, createCollectionOptions);
+
         MongoCollection<Document> usersCollection = mongoTemplate.getCollection(usersCollectionName);
         usersCollection.createIndex(Indexes.ascending("username"), new IndexOptions().unique(true));
 
