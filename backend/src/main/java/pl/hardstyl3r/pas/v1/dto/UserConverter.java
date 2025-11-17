@@ -11,7 +11,8 @@ public class UserConverter {
                 user.getId(),
                 user.getUsername(),
                 user.getName(),
-                user.isActive()
+                user.isActive(),
+                user.getRole()
         );
     }
 
