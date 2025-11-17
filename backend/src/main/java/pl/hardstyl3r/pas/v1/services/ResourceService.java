@@ -10,6 +10,8 @@ import pl.hardstyl3r.pas.v1.objects.resources.*;
 import pl.hardstyl3r.pas.v1.repositories.AllocationRepository;
 import pl.hardstyl3r.pas.v1.repositories.ResourceRepository;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.Optional;
 
@@ -29,6 +31,26 @@ public class ResourceService {
 
     public Optional<Resource> findById(String id) {
         return resourceRepository.findById(id);
+    }
+
+    private boolean isValidIsbn(String isbn) {
+        if (isbn == null) {
+            return false;
+        }
+        String cleanedIsbn = isbn.replace("-", "");
+        return cleanedIsbn.matches("^(?:978|979)?\\d{10}$") || cleanedIsbn.matches("^\\d{9}[\\dXx]$");
+    }
+
+    private boolean isValidDate(String date) {
+        if (date == null) {
+            return false;
+        }
+        try {
+            LocalDate.parse(date);
+            return true;
+        } catch (DateTimeParseException e) {
+            return false;
+        }
     }
 
     public Resource createResource(CreateResourceDTO dto) {
@@ -57,6 +79,9 @@ public class ResourceService {
                 if (dto.isbn() == null || dto.isbn().isBlank()) {
                     throw new ResourceValidationException("ISBN is required for a book.");
                 }
+                if (!isValidIsbn(dto.isbn())) {
+                    throw new ResourceValidationException("Invalid ISBN format.");
+                }
                 resource = new Book(dto.name(), dto.description(), dto.author(), dto.isbn());
                 break;
             case "periodical":
@@ -71,6 +96,9 @@ public class ResourceService {
             case "newspaper":
                 if (dto.releaseDate() == null) {
                     throw new ResourceValidationException("Release date is required for a newspaper.");
+                }
+                if (!isValidDate(dto.releaseDate())) {
+                    throw new ResourceValidationException("Invalid date format for releaseDate. Expected format is YYYY-MM-DD.");
                 }
                 resource = new Newspaper(dto.name(), dto.description(), dto.releaseDate());
                 break;
@@ -119,6 +147,9 @@ public class ResourceService {
             if (dto.isbn() == null || dto.isbn().isBlank()) {
                 throw new ResourceValidationException("ISBN is required for a book.");
             }
+            if (!isValidIsbn(dto.isbn())) {
+                throw new ResourceValidationException("Invalid ISBN format.");
+            }
             book.setAuthor(dto.author());
             book.setIsbn(dto.isbn());
         } else if (resource instanceof Periodical periodical) {
@@ -132,6 +163,9 @@ public class ResourceService {
         } else if (resource instanceof Newspaper newspaper) {
             if (dto.releaseDate() == null) {
                 throw new ResourceValidationException("Release date is required for a newspaper.");
+            }
+            if (!isValidDate(dto.releaseDate())) {
+                throw new ResourceValidationException("Invalid date format for releaseDate. Expected format is YYYY-MM-DD.");
             }
             newspaper.setReleaseDate(dto.releaseDate());
         }

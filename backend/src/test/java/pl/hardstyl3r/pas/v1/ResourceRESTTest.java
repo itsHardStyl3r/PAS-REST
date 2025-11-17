@@ -80,7 +80,7 @@ class ResourceRESTTest {
 
         Document book1 = new Document("_class", Book.class.getName()).append("name", "Morderstwo w Orient Expressie").append("description", "Herkules Poirot...").append("author", "Agatha Christie").append("isbn", "9788327159779");
         Document periodical = new Document("_class", Periodical.class.getName()).append("name", "CD-Action").append("description", "Magazyn...").append("issueNumber", 320);
-        Document newspaper = new Document("_class", Newspaper.class.getName()).append("name", "Gazeta Wyborcza").append("description", "Gazeta").append("releaseDate", "17-11-2025");
+        Document newspaper = new Document("_class", Newspaper.class.getName()).append("name", "Gazeta Wyborcza").append("description", "Gazeta").append("releaseDate", "2025-11-17");
         resourcesCollection.insertMany(Arrays.asList(book1, periodical, newspaper));
 
         this.bookId = Objects.requireNonNull(resourcesCollection.find(Filters.eq("name", "Morderstwo w Orient Expressie")).first()).getObjectId("_id").toHexString();
@@ -255,6 +255,64 @@ class ResourceRESTTest {
                 .contentType(ContentType.JSON)
                 .body(invalidUpdate)
                 .pathParam("id", bookId)
+                .when()
+                .put("/api/v1/resources/{id}")
+                .then()
+                .statusCode(400);
+    }
+
+    @Test
+    void shouldReturn400WhenCreatingBookWithInvalidIsbn() {
+        CreateResourceDTO invalidBook = new CreateResourceDTO("book", "A Book", "A description", "An author", "12345", null, null);
+
+        given()
+                .header("Authorization", "Bearer " + adminToken)
+                .contentType(ContentType.JSON)
+                .body(invalidBook)
+                .when()
+                .post("/api/v1/resources")
+                .then()
+                .statusCode(400);
+    }
+
+    @Test
+    void shouldReturn400WhenUpdatingBookWithInvalidIsbn() {
+        EditResourceDTO invalidUpdate = new EditResourceDTO("Valid Name", "desc", "author", "invalid-isbn", null, null);
+
+        given()
+                .header("Authorization", "Bearer " + adminToken)
+                .contentType(ContentType.JSON)
+                .body(invalidUpdate)
+                .pathParam("id", bookId)
+                .when()
+                .put("/api/v1/resources/{id}")
+                .then()
+                .statusCode(400);
+    }
+
+    @Test
+    void shouldReturn400WhenCreatingNewspaperWithInvalidDate() {
+        CreateResourceDTO invalidNewspaper = new CreateResourceDTO("newspaper", "A Newspaper", "A description", null, null, null, "2025/11/17");
+
+        given()
+                .header("Authorization", "Bearer " + adminToken)
+                .contentType(ContentType.JSON)
+                .body(invalidNewspaper)
+                .when()
+                .post("/api/v1/resources")
+                .then()
+                .statusCode(400);
+    }
+
+    @Test
+    void shouldReturn400WhenUpdatingNewspaperWithInvalidDate() {
+        EditResourceDTO invalidUpdate = new EditResourceDTO("Valid Name", "desc", null, null, null, "17-11-2025");
+
+        given()
+                .header("Authorization", "Bearer " + adminToken)
+                .contentType(ContentType.JSON)
+                .body(invalidUpdate)
+                .pathParam("id", newspaperId)
                 .when()
                 .put("/api/v1/resources/{id}")
                 .then()

@@ -134,7 +134,7 @@ public class MongoInit implements CommandLineRunner {
                         .append("_class", Newspaper.class.getName())
                         .append("name", "Gazeta Wyborcza")
                         .append("description", "Gazeta")
-                        .append("releaseDate", "17-11-2025")
+                        .append("releaseDate", "2025-11-17")
         );
 
         resourcesCollection.insertMany(resources);
