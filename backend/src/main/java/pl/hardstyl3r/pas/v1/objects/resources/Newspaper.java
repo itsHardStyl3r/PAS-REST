@@ -24,4 +24,14 @@ public class Newspaper extends Resource {
     public void setReleaseDate(String releaseDate) {
         this.releaseDate = releaseDate;
     }
+
+    @Override
+    public String toString() {
+        return "Newspaper{" +
+                "id='" + getId() + '\'' +
+                ", name='" + getName() + '\'' +
+                ", description='" + getDescription() + '\'' +
+                ", releaseDate='" + releaseDate + '\'' +
+                '}';
+    }
 }

@@ -3,6 +3,8 @@ package pl.hardstyl3r.pas.v1.objects.resources;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.util.Objects;
+
 @Document(collection = "#{@environment.getProperty('pas.mongodb.collection.resources')}")
 public abstract class Resource {
     @Id
@@ -47,5 +49,23 @@ public abstract class Resource {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    @Override
+    public String toString() {
+        return "Resource{" +
+                "id='" + id + '\'' +
+                ", name='" + name + '\'' +
+                ", description='" + description + '\'' +
+                '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Resource resource = (Resource) o;
+
+        return Objects.equals(id, resource.id);
     }
 }

@@ -4,6 +4,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 @Document(collection = "#{@environment.getProperty('pas.mongodb.collection.allocations')}")
 public class Allocation {
@@ -63,5 +64,25 @@ public class Allocation {
 
     public void setEndTime(LocalDateTime endTime) {
         this.endTime = endTime;
+    }
+
+    @Override
+    public String toString() {
+        return "Allocation{" +
+                "id='" + id + '\'' +
+                ", userId='" + userId + '\'' +
+                ", resourceId='" + resourceId + '\'' +
+                ", startTime=" + startTime +
+                ", endTime=" + endTime +
+                '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Allocation that = (Allocation) o;
+
+        return Objects.equals(id, that.id);
     }
 }

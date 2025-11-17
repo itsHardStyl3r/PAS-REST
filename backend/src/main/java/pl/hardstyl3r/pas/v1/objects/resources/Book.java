@@ -35,4 +35,15 @@ public class Book extends Resource {
     public void setIsbn(String isbn) {
         this.isbn = isbn;
     }
+
+    @Override
+    public String toString() {
+        return "Book{" +
+                "id='" + getId() + '\'' +
+                ", name='" + getName() + '\'' +
+                ", description='" + getDescription() + '\'' +
+                ", author='" + author + '\'' +
+                ", isbn='" + isbn + '\'' +
+                '}';
+    }
 }

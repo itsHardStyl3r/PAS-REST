@@ -24,4 +24,14 @@ public class Periodical extends Resource {
     public void setIssueNumber(int issueNumber) {
         this.issueNumber = issueNumber;
     }
+
+    @Override
+    public String toString() {
+        return "Periodical{" +
+                "id='" + getId() + '\'' +
+                ", name='" + getName() + '\'' +
+                ", description='" + getDescription() + '\'' +
+                ", issueNumber=" + issueNumber +
+                '}';
+    }
 }
