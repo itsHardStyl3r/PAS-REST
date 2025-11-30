@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <meta name="description" content=""/>
+    <title th:text="#{app.title}">Biblioteka</title>
+    <link rel="stylesheet" th:href="@{/bootstrap.min.css}">
+    <link rel="stylesheet" th:href="@{/bootstrap.icons.min.css}">
+    <style>
+        body {
+            display: flex;
+            min-height: 100vh;
+            min-height: -webkit-fill-available;
+        }
+
+        main {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .content-wrapper {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .content-body {
+            flex-grow: 1;
+        }
+    </style>
+</head>
+<body>
+
+<div class="d-flex flex-column flex-shrink-0 p-3 bg-light border-end" style="width: 280px;">
+    <a th:href="@{/allocations}"
+       class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-dark text-decoration-none">
+        <i class="bi bi-book-half pe-none me-2" style="font-size: 32px;"></i>
+        <span class="fs-4" th:text="#{app.title}">Biblioteka</span>
+    </a>
+    <hr/>
+    <ul class="nav nav-pills flex-column mb-auto">
+        <li class="nav-item">
+            <a th:href="@{/allocations}" class="nav-link"
+               th:classappend="${activeMenu == 'allocations' ? 'active' : 'text-dark'}">
+                <i class="bi bi-journals pe-none me-2"></i>
+                <span th:text="#{menu.allocations}">Zarządzanie alokacjami</span>
+            </a>
+        </li>
+        <li>
+            <a th:href="@{/users/register}" class="nav-link"
+               th:classappend="${activeMenu == 'register' ? 'active' : 'text-dark'}">
+                <i class="bi bi-people-fill pe-none me-2"></i>
+                <span th:text="#{menu.register_user}">Rejestracja użytkowników</span>
+            </a>
+        </li>
+    </ul>
+</div>
+
+<main>
+    <div class="content-wrapper container-fluid p-4">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a th:href="@{/allocations}" th:text="#{breadcrumbs.home}">Strona główna</a>
+                </li>
+                <li class="breadcrumb-item active" aria-current="page" th:text="${pageTitle}"></li>
+            </ol>
+        </nav>
+        <div class="content-body bg-body-tertiary p-4 rounded">
+            <div layout:fragment="content">
+            </div>
+        </div>
+        <footer class="footer mt-auto py-3 bg-body-tertiary">
+            <span th:text="#{app.footer}">Aplikacja Podstawy Aplikacji Sieciowych</span>
+        </footer>
+    </div>
+</main>
+
+<script th:src="@{/bootstrap.bundle.min.js}"></script>
+<script layout:fragment="scripts"></script>
+</body>
+</html>

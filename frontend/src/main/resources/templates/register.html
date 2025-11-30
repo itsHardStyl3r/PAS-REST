@@ -1,38 +1,65 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" lang="pl">
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout.html}" lang="pl">
 <head>
-    <title>Rejestracja</title>
+    <title th:text="#{menu.register_user}">Rejestracja</title>
 </head>
 <body>
-<h1>Rejestracja użytkownika</h1>
 
-<div th:if="${param.success}">
-    <p>Rejestracja zakończona pomyślnie!</p>
+<div layout:fragment="content">
+    <h1 th:text="#{menu.register_user}">Rejestracja użytkownika</h1>
+
+    <div th:if="${param.success}" class="alert alert-success alert-dismissible fade show" role="alert">
+        <p class="mb-0" th:text="#{register.success}">Rejestracja zakończona pomyślnie!</p>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" th:aria-label="#{action.close}"></button>
+    </div>
+
+    <form th:action="@{/users/register}" th:object="${registerRequest}" method="post" class="needs-validation" novalidate>
+        <div th:if="${#fields.hasGlobalErrors()}" class="alert alert-danger alert-dismissible fade show" role="alert">
+            <div th:each="err : ${#fields.globalErrors()}" th:text="${err}">Błąd globalny</div>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" th:aria-label="#{action.close}"></button>
+        </div>
+
+        <div class="mb-3">
+            <label for="username" class="form-label" th:text="#{field.username}">Nazwa użytkownika:</label>
+            <input type="text" id="username" th:field="*{username}" class="form-control" required/>
+            <div class="invalid-feedback" th:if="${#fields.hasErrors('username')}" th:errors="*{username}"></div>
+        </div>
+        <div class="mb-3">
+            <label for="password" class="form-label" th:text="#{field.password}">Hasło:</label>
+            <input type="password" id="password" th:field="*{password}" class="form-control" required/>
+            <div class="invalid-feedback" th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></div>
+        </div>
+        <div class="mb-3">
+            <label for="name" class="form-label" th:text="#{field.name}">Imię:</label>
+            <input type="text" id="name" th:field="*{name}" class="form-control" required/>
+            <div class="invalid-feedback" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></div>
+        </div>
+        <div>
+            <button type="submit" class="btn btn-primary" th:text="#{menu.register_user}">Zarejestruj</button>
+        </div>
+    </form>
 </div>
 
-<form th:action="@{/users/register}" th:object="${registerRequest}" method="post">
-    <div th:if="${#fields.hasGlobalErrors()}">
-        <p th:each="err : ${#fields.globalErrors()}" th:text="${err}">Błąd globalny</p>
-    </div>
+<th:block layout:fragment="scripts">
+    <script>
+        (function () {
+            'use strict'
+            var forms = document.querySelectorAll('.needs-validation')
+            Array.prototype.slice.call(forms)
+                .forEach(function (form) {
+                    form.addEventListener('submit', function (event) {
+                        if (!form.checkValidity()) {
+                            event.preventDefault()
+                            event.stopPropagation()
+                        }
+                        form.classList.add('was-validated')
+                    }, false)
+                })
+        })()
+    </script>
+</th:block>
 
-    <div>
-        <label for="username">Nazwa użytkownika:</label>
-        <input type="text" id="username" th:field="*{username}"/>
-        <p th:if="${#fields.hasErrors('username')}" th:errors="*{username}">Błąd nazwy użytkownika</p>
-    </div>
-    <div>
-        <label for="password">Hasło:</label>
-        <input type="password" id="password" th:field="*{password}"/>
-        <p th:if="${#fields.hasErrors('password')}" th:errors="*{password}">Błąd hasła</p>
-    </div>
-    <div>
-        <label for="name">Imię:</label>
-        <input type="text" id="name" th:field="*{name}"/>
-        <p th:if="${#fields.hasErrors('name')}" th:errors="*{name}">Błąd imienia</p>
-    </div>
-    <div>
-        <button type="submit">Zarejestruj</button>
-    </div>
-</form>
 </body>
 </html>

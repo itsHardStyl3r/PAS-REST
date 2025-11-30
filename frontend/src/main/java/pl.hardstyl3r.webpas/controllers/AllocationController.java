@@ -23,6 +23,8 @@ public class AllocationController {
             model.addAttribute("allocationRequest", new AllocationRequest());
         }
         model.addAttribute("allocations", allocationService.getAllAllocations());
+        model.addAttribute("pageTitle", "Alokacje");
+        model.addAttribute("activeMenu", "allocations");
         return "allocations";
     }
 
@@ -31,9 +33,10 @@ public class AllocationController {
                                    RedirectAttributes redirectAttributes) {
         try {
             allocationService.createAllocation(allocationRequest);
-            redirectAttributes.addFlashAttribute("successMessage", "Alokacja została utworzona pomyślnie.");
+            redirectAttributes.addFlashAttribute("successMessage", "allocations.success.created");
         } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("errorMessage", "Błąd tworzenia alokacji: " + e.getMessage());
+            redirectAttributes.addFlashAttribute("errorMessage", "allocations.error.creating");
+            redirectAttributes.addFlashAttribute("errorDetails", e.getMessage());
         }
         return "redirect:/allocations";
     }
@@ -42,9 +45,10 @@ public class AllocationController {
     public String endAllocation(@PathVariable String id, RedirectAttributes redirectAttributes) {
         try {
             allocationService.endAllocation(id);
-            redirectAttributes.addFlashAttribute("successMessage", "Alokacja została zakończona.");
+            redirectAttributes.addFlashAttribute("successMessage", "allocations.success.ended");
         } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("errorMessage", "Wystąpił błąd podczas kończenia alokacji: " + e.getMessage());
+            redirectAttributes.addFlashAttribute("errorMessage", "allocations.error.ending");
+            redirectAttributes.addFlashAttribute("errorDetails", e.getMessage());
         }
         return "redirect:/allocations";
     }

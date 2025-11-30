@@ -24,12 +24,16 @@ public class UserController {
     @GetMapping("/register")
     public String showRegistrationForm(Model model) {
         model.addAttribute("registerRequest", new RegisterRequest());
+        model.addAttribute("pageTitle", "Rejestracja");
+        model.addAttribute("activeMenu", "register");
         return "register";
     }
 
     @PostMapping("/register")
     public String processRegistration(@Valid @ModelAttribute("registerRequest") RegisterRequest registerRequest,
-                                      BindingResult bindingResult) {
+                                      BindingResult bindingResult, Model model) {
+        model.addAttribute("pageTitle", "Rejestracja");
+        model.addAttribute("activeMenu", "register");
         if (bindingResult.hasErrors()) {
             return "register";
         }
