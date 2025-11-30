@@ -13,15 +13,18 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
+import pl.hardstyl3r.pas.v1.objects.Allocation;
 import pl.hardstyl3r.pas.v1.objects.User;
 import pl.hardstyl3r.pas.v1.objects.UserRole;
 import pl.hardstyl3r.pas.v1.objects.resources.Book;
 import pl.hardstyl3r.pas.v1.objects.resources.Newspaper;
 import pl.hardstyl3r.pas.v1.objects.resources.Periodical;
 import pl.hardstyl3r.pas.v1.objects.resources.Resource;
+import pl.hardstyl3r.pas.v1.repositories.AllocationRepository;
 import pl.hardstyl3r.pas.v1.repositories.ResourceRepository;
 import pl.hardstyl3r.pas.v1.repositories.UserRepository;
 
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 
@@ -32,8 +35,10 @@ public class MongoInit implements CommandLineRunner {
     private final MongoTemplate mongoTemplate;
     private final String usersCollectionName;
     private final String resourcesCollectionName;
+    private final String allocationsCollectionName;
     private final UserRepository userRepository;
     private final ResourceRepository resourceRepository;
+    private final AllocationRepository allocationRepository;
     private final PasswordEncoder passwordEncoder;
     private static final Logger logger = LoggerFactory.getLogger(MongoInit.class);
 
@@ -41,21 +46,26 @@ public class MongoInit implements CommandLineRunner {
     public MongoInit(MongoTemplate mongoTemplate,
                      UserRepository userRepository,
                      ResourceRepository resourceRepository,
+                     AllocationRepository allocationRepository,
                      PasswordEncoder passwordEncoder,
                      @Value("${pas.mongodb.collection.resources}") String resourcesCollectionName,
-                     @Value("${pas.mongodb.collection.users}") String usersCollectionName) {
+                     @Value("${pas.mongodb.collection.users}") String usersCollectionName,
+                     @Value("${pas.mongodb.collection.allocations}") String allocationsCollectionName) {
         this.mongoTemplate = mongoTemplate;
         this.userRepository = userRepository;
         this.resourceRepository = resourceRepository;
+        this.allocationRepository = allocationRepository;
         this.passwordEncoder = passwordEncoder;
         this.resourcesCollectionName = resourcesCollectionName;
         this.usersCollectionName = usersCollectionName;
+        this.allocationsCollectionName = allocationsCollectionName;
     }
 
     @Override
     public void run(String... args) {
         initUsers();
         initResources();
+        initAllocations();
     }
 
     private void initUsers() {
@@ -109,5 +119,22 @@ public class MongoInit implements CommandLineRunner {
 
         resources.forEach(resourceRepository::save);
         logger.info("Database has been initialized with {} resources.", resources.size());
+    }
+
+    private void initAllocations() {
+        mongoTemplate.dropCollection(allocationsCollectionName);
+
+        Allocation activeAllocation = new Allocation("60c72b2f9b1e8a3f3c8e4b1d", "60c72b2f9b1e8a3f3c8e4b2c");
+        activeAllocation.setId("692c9fe56f86670cdd4f55f0");
+        activeAllocation.setStartTime(LocalDateTime.now().minusDays(1));
+        allocationRepository.save(activeAllocation);
+
+        Allocation pastAllocation = new Allocation("60c72b2f9b1e8a3f3c8e4b1a", "60c72b2f9b1e8a3f3c8e4b2a");
+        pastAllocation.setId("692c9fe56f86670cdd4f55f1");
+        pastAllocation.setStartTime(LocalDateTime.now().minusDays(10));
+        pastAllocation.setEndTime(LocalDateTime.now().minusDays(5));
+        allocationRepository.save(pastAllocation);
+
+        logger.info("Database has been initialized with 2 allocations.");
     }
 }
