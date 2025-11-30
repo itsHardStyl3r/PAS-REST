@@ -1,0 +1,38 @@
+### Pobierz wszystkie alokacje (getAllAllocations)
+GET http://localhost:8080/api/v1/allocations
+
+### Pobierz alokację po ID (getAllocationById) #wpisz-id
+GET http://localhost:8080/api/v1/allocations/-----
+Authorization: Bearer {{admin_token}}
+
+### Utwórz nową alokację (createAllocation) #wpisz-id
+POST http://localhost:8080/api/v1/allocations
+Authorization: Bearer {{admin_token}}
+Content-Type: application/json
+
+{
+  "userId": "-----",
+  "resourceId": "-----"
+}
+
+### Zakończ alokację (endAllocation) #wpisz-id
+POST http://localhost:8080/api/v1/allocations/-----/end
+Authorization: Bearer {{admin_token}}
+
+### Usuń alokację (deleteAllocation) #wpisz-id
+DELETE http://localhost:8080/api/v1/allocations/-----
+Authorization: Bearer {{admin_token}}
+
+### Pobierz aktualne alokacje dla użytkownika (getCurrentAllocationsForUser) #wpisz-id
+GET http://localhost:8080/api/v1/allocations/user/-----/current
+
+### Pobierz przeszłe alokacje dla użytkownika (getPastAllocationsForUser) #wpisz-id
+GET http://localhost:8080/api/v1/allocations/user/-----/past
+
+### Pobierz aktualne alokacje dla zasobu (getCurrentAllocationsForResource) #wpisz-id
+GET http://localhost:8080/api/v1/allocations/resource/-----/current
+Authorization: Bearer {{admin_token}}
+
+### Pobierz przeszłe alokacje dla zasobu (getPastAllocationsForResource) #wpisz-id
+GET http://localhost:8080/api/v1/allocations/resource/-----/past
+Authorization: Bearer {{admin_token}}
