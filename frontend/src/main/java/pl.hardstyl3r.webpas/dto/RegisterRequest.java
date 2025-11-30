@@ -5,15 +5,15 @@ import jakarta.validation.constraints.Size;
 
 public class RegisterRequest {
 
-    @NotBlank(message = "Nazwa użytkownika jest wymagana")
-    @Size(min = 3, message = "Nazwa użytkownika musi mieć co najmniej 3 znaki")
+    @NotBlank(message = "{validation.username.notblank}")
+    @Size(min = 3, message = "{validation.username.size}")
     private String username;
 
-    @NotBlank(message = "Hasło jest wymagane")
-    @Size(min = 6, message = "Hasło musi mieć co najmniej 6 znaków")
+    @NotBlank(message = "{validation.password.notblank}")
+    @Size(min = 6, message = "{validation.password.size}")
     private String password;
 
-    @NotBlank(message = "Imię jest wymagane")
+    @NotBlank(message = "{validation.name.notblank}")
     private String name;
 
     public String getUsername() {

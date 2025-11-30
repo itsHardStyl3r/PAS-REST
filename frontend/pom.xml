@@ -10,7 +10,7 @@
     </parent>
     <groupId>pl.hardstyl3r</groupId>
     <artifactId>webpas</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>0.0.2-SNAPSHOT</version>
     <name>SpringMVC</name>
     <description>Web application</description>
     <url/>
