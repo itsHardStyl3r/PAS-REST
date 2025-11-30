@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="pl">
+<head>
+    <title>Zarządzanie Alokacjami</title>
+    <style>
+        .error { color: red; }
+        .success { color: green; }
+        table { border-collapse: collapse; width: 100%; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background-color: #f2f2f2; }
+    </style>
+</head>
+<body>
+<h1>Zarządzanie Alokacjami</h1>
+
+<div th:if="${successMessage}" class="success" th:text="${successMessage}"></div>
+<div th:if="${errorMessage}" class="error" th:text="${errorMessage}"></div>
+
+<h2>Nowa alokacja</h2>
+<form th:action="@{/allocations}" th:object="${allocationRequest}" method="post" autocomplete="off">
+    <div>
+        <label for="userId">ID Klienta:</label>
+        <input type="text" id="userId" th:field="*{userId}"/>
+        <p th:if="${#fields.hasErrors('userId')}" th:errors="*{userId}" class="error">Błąd ID klienta</p>
+    </div>
+    <div>
+        <label for="resourceId">ID Zasobu:</label>
+        <input type="text" id="resourceId" th:field="*{resourceId}"/>
+        <p th:if="${#fields.hasErrors('resourceId')}" th:errors="*{resourceId}" class="error">Błąd ID zasobu</p>
+    </div>
+    <div>
+        <button type="submit">Utwórz alokację</button>
+    </div>
+</form>
+
+<hr/>
+
+<h2>Lista alokacji</h2>
+<table>
+    <thead>
+    <tr>
+        <th>ID Alokacji</th>
+        <th>ID Zasobu</th>
+        <th>ID Klienta</th>
+        <th>Czas rozpoczęcia</th>
+        <th>Czas zakończenia</th>
+        <th>Akcje</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="alloc : ${allocations}">
+        <td th:text="${alloc.id}"></td>
+        <td th:text="${alloc.resourceId}"></td>
+        <td th:text="${alloc.userId}"></td>
+        <td th:text="${alloc.startTime != null ? #temporals.format(alloc.startTime, 'yyyy-MM-dd HH:mm:ss') : ''}"></td>
+        <td th:text="${alloc.endTime != null ? #temporals.format(alloc.endTime, 'yyyy-MM-dd HH:mm:ss') : 'Aktywna'}"></td>
+        <td>
+            <form th:if="${alloc.endTime == null}" th:action="@{/allocations/{id}/end(id=${alloc.id})}" method="post" style="display:inline;">
+                <button type="submit">Zakończ</button>
+            </form>
+        </td>
+    </tr>
+    </tbody>
+</table>
+
+<p><a th:href="@{/users/register}">Zarejestruj nowego użytkownika</a></p>
+
+</body>
+</html>
