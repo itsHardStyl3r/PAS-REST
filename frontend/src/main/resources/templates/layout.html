@@ -56,6 +56,13 @@
                 <span th:text="#{menu.register_user}">Rejestracja użytkowników</span>
             </a>
         </li>
+        <li>
+            <a th:href="@{/users/search}" class="nav-link"
+               th:classappend="${activeMenu == 'users_search' ? 'active' : 'text-dark'}">
+                <i class="bi bi-search pe-none me-2"></i>
+                <span th:text="#{menu.search_users}">Wyszukaj użytkownika</span>
+            </a>
+        </li>
     </ul>
 </div>
 
