@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="pl">
+<head>
+    <title>Rejestracja</title>
+</head>
+<body>
+<h1>Rejestracja użytkownika</h1>
+
+<div th:if="${param.success}">
+    <p>Rejestracja zakończona pomyślnie!</p>
+</div>
+
+<form th:action="@{/users/register}" th:object="${registerRequest}" method="post">
+    <div th:if="${#fields.hasGlobalErrors()}">
+        <p th:each="err : ${#fields.globalErrors()}" th:text="${err}">Błąd globalny</p>
+    </div>
+
+    <div>
+        <label for="username">Nazwa użytkownika:</label>
+        <input type="text" id="username" th:field="*{username}"/>
+        <p th:if="${#fields.hasErrors('username')}" th:errors="*{username}">Błąd nazwy użytkownika</p>
+    </div>
+    <div>
+        <label for="password">Hasło:</label>
+        <input type="password" id="password" th:field="*{password}"/>
+        <p th:if="${#fields.hasErrors('password')}" th:errors="*{password}">Błąd hasła</p>
+    </div>
+    <div>
+        <label for="name">Imię:</label>
+        <input type="text" id="name" th:field="*{name}"/>
+        <p th:if="${#fields.hasErrors('name')}" th:errors="*{name}">Błąd imienia</p>
+    </div>
+    <div>
+        <button type="submit">Zarejestruj</button>
+    </div>
+</form>
+</body>
+</html>
