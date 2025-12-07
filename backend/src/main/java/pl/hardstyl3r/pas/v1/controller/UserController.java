@@ -1,5 +1,6 @@
 package pl.hardstyl3r.pas.v1.controller;
 
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -74,12 +75,9 @@ public class UserController {
     }
 
     @PatchMapping("/user/id/{id}/rename")
-    public void renameUser(@PathVariable String id, @RequestBody EditUserDTO userDTO) {
+    public void renameUser(@PathVariable String id, @Valid @RequestBody EditUserDTO userDTO) {
         if (userService.findUserById(id).isEmpty()) {
             throw new UserNotFoundException("User with id " + id + " not found");
-        }
-        if (userDTO.name() == null || userDTO.name().isBlank()) {
-            throw new UserValidationException("Name cannot be blank");
         }
         userService.renameUserById(id, userDTO.name());
     }

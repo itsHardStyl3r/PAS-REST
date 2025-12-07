@@ -1,6 +1,9 @@
 package pl.hardstyl3r.pas.v1.objects;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.Objects;
@@ -9,10 +12,21 @@ import java.util.Objects;
 public class User {
     @Id
     private String id;
+
+    @NotBlank(message = "Nazwa użytkownika nie może być pusta.")
+    @Size(min = 3, max = 32, message = "Nazwa użytkownika musi mieć od 3 do 32 znaków.")
+    @Indexed(unique = true)
     private String username;
+
+    @NotBlank(message = "Imię nie może być puste.")
+    @Size(min = 3, max = 64, message = "Imię musi mieć od 3 do 64 znaków.")
     private String name;
+
     private boolean active = false;
     private UserRole role = UserRole.CLIENT;
+
+    @NotBlank(message = "Hasło nie może być puste.")
+    @Size(min = 8, message = "Hasło musi mieć co najmniej 8 znaków.")
     private String password;
 
     protected User() {

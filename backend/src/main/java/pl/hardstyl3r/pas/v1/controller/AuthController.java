@@ -1,5 +1,6 @@
 package pl.hardstyl3r.pas.v1.controller;
 
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 import pl.hardstyl3r.pas.v1.dto.JwtResponse;
 import pl.hardstyl3r.pas.v1.dto.LoginRequest;
 import pl.hardstyl3r.pas.v1.dto.RegisterRequest;
+import pl.hardstyl3r.pas.v1.exceptions.UsernameIsTakenException;
 import pl.hardstyl3r.pas.v1.objects.User;
 import pl.hardstyl3r.pas.v1.security.JwtUtil;
 import pl.hardstyl3r.pas.v1.services.UserService;
@@ -33,9 +35,9 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> authenticateUser(@RequestBody LoginRequest loginRequest) {
+    public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
         Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
+                new UsernamePasswordAuthenticationToken(loginRequest.username(), loginRequest.password()));
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
@@ -52,8 +54,12 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<?> registerUser(@RequestBody RegisterRequest registerRequest) {
-        User user = new User(registerRequest.getUsername(), registerRequest.getPassword(), registerRequest.getName(), true);
+    public ResponseEntity<?> registerUser(@Valid @RequestBody RegisterRequest registerRequest) {
+        if (userService.findUserByUsername(registerRequest.username()).isPresent()) {
+            throw new UsernameIsTakenException(registerRequest.username());
+        }
+
+        User user = new User(registerRequest.username(), registerRequest.password(), registerRequest.name(), false);
         userService.registerUser(user);
         return ResponseEntity.ok("User registered successfully!");
     }
