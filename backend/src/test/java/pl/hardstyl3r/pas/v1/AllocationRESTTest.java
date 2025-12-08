@@ -47,6 +47,7 @@ class AllocationRESTTest {
     private String allocationsCollectionName;
 
     private String activeUserId;
+    private String inactiveUserId;
     private String availableResourceId;
     private String allocatedResourceId;
     private String currentAllocationId;
@@ -76,6 +77,10 @@ class AllocationRESTTest {
         Document adminUser = new Document("username", "admin").append("name", "Admin User").append("active", true).append("password", passwordEncoder.encode("password")).append("role", UserRole.ADMIN.name());
         users.insertOne(adminUser);
         activeUserId = adminUser.getObjectId("_id").toHexString();
+
+        Document inactiveUser = new Document("username", "user").append("name", "Inactive User").append("active", false).append("password", passwordEncoder.encode("password")).append("role", UserRole.CLIENT.name());
+        users.insertOne(inactiveUser);
+        inactiveUserId = inactiveUser.getObjectId("_id").toHexString();
 
         adminToken = loginAndGetToken("admin", "password");
 
@@ -175,4 +180,53 @@ class AllocationRESTTest {
                 .statusCode(409);
     }
 
+    @Test
+    void shouldFailToCreateAllocationForInactiveUser() {
+        Map<String, String> payload = new HashMap<>();
+        payload.put("userId", inactiveUserId);
+        payload.put("resourceId", availableResourceId);
+
+        given()
+                .header("Authorization", "Bearer " + adminToken)
+                .contentType(ContentType.JSON)
+                .body(payload)
+                .when()
+                .post("/api/v1/allocations")
+                .then()
+                .statusCode(409);
+    }
+
+    @Test
+    void shouldFailToCreateAllocationForNonExistentUser() {
+        String nonExistentUserId = "60c72b2f9b1e8b3b3c8b4567";
+        Map<String, String> payload = new HashMap<>();
+        payload.put("userId", nonExistentUserId);
+        payload.put("resourceId", availableResourceId);
+
+        given()
+                .header("Authorization", "Bearer " + adminToken)
+                .contentType(ContentType.JSON)
+                .body(payload)
+                .when()
+                .post("/api/v1/allocations")
+                .then()
+                .statusCode(404);
+    }
+
+    @Test
+    void shouldFailToCreateAllocationForNonExistentResource() {
+        String nonExistentResourceId = "60c72b2f9b1e8b3b3c8b4568";
+        Map<String, String> payload = new HashMap<>();
+        payload.put("userId", activeUserId);
+        payload.put("resourceId", nonExistentResourceId);
+
+        given()
+                .header("Authorization", "Bearer " + adminToken)
+                .contentType(ContentType.JSON)
+                .body(payload)
+                .when()
+                .post("/api/v1/allocations")
+                .then()
+                .statusCode(404);
+    }
 }
