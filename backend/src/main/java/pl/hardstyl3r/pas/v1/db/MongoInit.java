@@ -1,8 +1,12 @@
 package pl.hardstyl3r.pas.v1.db;
 
+import com.mongodb.MongoCommandException;
 import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoDatabase;
+import com.mongodb.client.model.CreateCollectionOptions;
 import com.mongodb.client.model.IndexOptions;
 import com.mongodb.client.model.Indexes;
+import com.mongodb.client.model.ValidationOptions;
 import org.bson.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,6 +37,7 @@ import java.util.List;
 public class MongoInit implements CommandLineRunner {
 
     private final MongoTemplate mongoTemplate;
+    private final MongoDatabase mongoDatabase;
     private final String usersCollectionName;
     private final String resourcesCollectionName;
     private final String allocationsCollectionName;
@@ -44,6 +49,7 @@ public class MongoInit implements CommandLineRunner {
 
     @Autowired
     public MongoInit(MongoTemplate mongoTemplate,
+                     MongoDatabase mongoDatabase,
                      UserRepository userRepository,
                      ResourceRepository resourceRepository,
                      AllocationRepository allocationRepository,
@@ -52,6 +58,7 @@ public class MongoInit implements CommandLineRunner {
                      @Value("${pas.mongodb.collection.users}") String usersCollectionName,
                      @Value("${pas.mongodb.collection.allocations}") String allocationsCollectionName) {
         this.mongoTemplate = mongoTemplate;
+        this.mongoDatabase = mongoDatabase;
         this.userRepository = userRepository;
         this.resourceRepository = resourceRepository;
         this.allocationRepository = allocationRepository;
@@ -68,8 +75,30 @@ public class MongoInit implements CommandLineRunner {
         initAllocations();
     }
 
+    private void createCollectionWithSchemaValidation(String collectionName, Document validator) {
+        mongoTemplate.dropCollection(collectionName);
+        ValidationOptions validationOptions = new ValidationOptions().validator(validator);
+        try {
+            mongoDatabase.createCollection(collectionName, new CreateCollectionOptions().validationOptions(validationOptions));
+        } catch (MongoCommandException e) {
+            if (e.getCode() == 48) logger.warn("Collection {} already exists. Skipping creation.", collectionName);
+            else throw e;
+        }
+    }
+
     private void initUsers() {
-        mongoTemplate.dropCollection(usersCollectionName);
+        Document userSchema = new Document("$jsonSchema",
+                new Document("bsonType", "object")
+                        .append("required", Arrays.asList("username", "name", "password", "active", "role"))
+                        .append("properties", new Document()
+                                .append("username", new Document("bsonType", "string").append("description", "must be a string and is required"))
+                                .append("name", new Document("bsonType", "string").append("description", "must be a string and is required"))
+                                .append("password", new Document("bsonType", "string").append("description", "must be a string and is required"))
+                                .append("active", new Document("bsonType", "bool").append("description", "must be a boolean and is required"))
+                                .append("role", new Document("bsonType", "string").append("description", "must be a string and is required"))
+                        )
+        );
+        createCollectionWithSchemaValidation(usersCollectionName, userSchema);
         MongoCollection<Document> usersCollection = mongoTemplate.getCollection(usersCollectionName);
         usersCollection.createIndex(Indexes.ascending("username"), new IndexOptions().unique(true));
 
@@ -108,7 +137,15 @@ public class MongoInit implements CommandLineRunner {
     }
 
     private void initResources() {
-        mongoTemplate.dropCollection(resourcesCollectionName);
+        Document resourceSchema = new Document("$jsonSchema",
+                new Document("bsonType", "object")
+                        .append("required", Arrays.asList("name", "description"))
+                        .append("properties", new Document()
+                                .append("name", new Document("bsonType", "string").append("description", "must be a string and is required"))
+                                .append("description", new Document("bsonType", "string").append("description", "must be a string and is required"))
+                        )
+        );
+        createCollectionWithSchemaValidation(resourcesCollectionName, resourceSchema);
 
         List<Resource> resources = Arrays.asList(
                 new Book("60c72b2f9b1e8a3f3c8e4b2a", "Morderstwo w Orient Expressie", "Herkules Poirot po rozwiązaniu sprawy kryminalnej w Azji wraca do Europy.", "Agatha Christie", "9788327159779"),
@@ -122,7 +159,17 @@ public class MongoInit implements CommandLineRunner {
     }
 
     private void initAllocations() {
-        mongoTemplate.dropCollection(allocationsCollectionName);
+        Document allocationSchema = new Document("$jsonSchema",
+                new Document("bsonType", "object")
+                        .append("required", Arrays.asList("userId", "resourceId", "startTime"))
+                        .append("properties", new Document()
+                                .append("userId", new Document("bsonType", "string").append("description", "must be a string and is required"))
+                                .append("resourceId", new Document("bsonType", "string").append("description", "must be a string and is required"))
+                                .append("startTime", new Document("bsonType", "date").append("description", "must be a date and is required"))
+                                .append("endTime", new Document("bsonType", "date").append("description", "must be a date and is optional"))
+                        )
+        );
+        createCollectionWithSchemaValidation(allocationsCollectionName, allocationSchema);
 
         Allocation activeAllocation = new Allocation("60c72b2f9b1e8a3f3c8e4b1d", "60c72b2f9b1e8a3f3c8e4b2c");
         activeAllocation.setId("692c9fe56f86670cdd4f55f0");
