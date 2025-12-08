@@ -75,6 +75,7 @@ public class UserController {
     }
 
     @PatchMapping("/user/id/{id}/rename")
+    @PreAuthorize("hasRole('ADMIN')")
     public void renameUser(@PathVariable String id, @Valid @RequestBody EditUserDTO userDTO) {
         if (userService.findUserById(id).isEmpty()) {
             throw new UserNotFoundException("User with id " + id + " not found");
