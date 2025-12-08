@@ -36,17 +36,17 @@ public class AllocationService {
 
     public Allocation createAllocation(String userId, String resourceId) {
         if (userId == null || userId.isBlank()) {
-            throw new AllocationException("User ID cannot be blank.");
+            throw new InputValidationException("User ID cannot be blank.");
         }
         if (resourceId == null || resourceId.isBlank()) {
-            throw new AllocationException("Resource ID cannot be blank.");
+            throw new InputValidationException("Resource ID cannot be blank.");
         }
 
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException("User with id " + userId + " not found."));
 
         if (!user.isActive()) {
-            throw new AllocationException("Cannot create allocation. User with id " + userId + " is not active.");
+            throw new UserNotActiveException("Cannot create allocation. User with id " + userId + " is not active.");
         }
 
         resourceRepository.findById(resourceId)
@@ -62,7 +62,7 @@ public class AllocationService {
 
     public Allocation endAllocation(String id) {
         if (id == null || id.isBlank()) {
-            throw new AllocationException("Allocation ID cannot be blank.");
+            throw new InputValidationException("Allocation ID cannot be blank.");
         }
         Allocation allocation = allocationRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Allocation with id " + id + " not found."));
@@ -77,7 +77,7 @@ public class AllocationService {
 
     public void deleteById(String id) {
         if (id == null || id.isBlank()) {
-            throw new AllocationException("Allocation ID cannot be blank.");
+            throw new InputValidationException("Allocation ID cannot be blank.");
         }
         Allocation allocation = allocationRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Allocation with id " + id + " not found."));
@@ -90,7 +90,7 @@ public class AllocationService {
 
     public List<Allocation> getCurrentAllocationsForUser(String userId) {
         if (userId == null || userId.isBlank()) {
-            throw new AllocationException("User ID cannot be blank.");
+            throw new InputValidationException("User ID cannot be blank.");
         }
         return allocationRepository.findByUserId(userId).stream()
                 .filter(a -> a.getEndTime() == null)
@@ -99,7 +99,7 @@ public class AllocationService {
 
     public List<Allocation> getPastAllocationsForUser(String userId) {
         if (userId == null || userId.isBlank()) {
-            throw new AllocationException("User ID cannot be blank.");
+            throw new InputValidationException("User ID cannot be blank.");
         }
         return allocationRepository.findByUserId(userId).stream()
                 .filter(a -> a.getEndTime() != null)
@@ -108,7 +108,7 @@ public class AllocationService {
 
     public List<Allocation> getCurrentAllocationsForResource(String resourceId) {
         if (resourceId == null || resourceId.isBlank()) {
-            throw new AllocationException("Resource ID cannot be blank.");
+            throw new InputValidationException("Resource ID cannot be blank.");
         }
         return allocationRepository.findByResourceId(resourceId).stream()
                 .filter(a -> a.getEndTime() == null)
@@ -117,7 +117,7 @@ public class AllocationService {
 
     public List<Allocation> getPastAllocationsForResource(String resourceId) {
         if (resourceId == null || resourceId.isBlank()) {
-            throw new AllocationException("Resource ID cannot be blank.");
+            throw new InputValidationException("Resource ID cannot be blank.");
         }
         return allocationRepository.findByResourceId(resourceId).stream()
                 .filter(a -> a.getEndTime() != null)

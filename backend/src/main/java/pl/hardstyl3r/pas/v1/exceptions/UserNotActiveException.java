@@ -5,17 +5,18 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-public class AllocationException extends RuntimeException {
-    public AllocationException(String message) {
+public class UserNotActiveException extends RuntimeException {
+    public UserNotActiveException(String message) {
         super(message);
     }
 }
 
 @RestControllerAdvice
-class AllocationAdvice {
-    @ExceptionHandler(AllocationException.class)
+class UserNotActiveAdvice {
+
+    @ExceptionHandler(UserNotActiveException.class)
     @ResponseStatus(HttpStatus.CONFLICT)
-    String allocationHandler(AllocationException ex) {
+    String userNotActiveHandler(UserNotActiveException ex) {
         return ex.getMessage();
     }
 }
