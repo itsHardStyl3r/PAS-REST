@@ -1,8 +1,10 @@
 package pl.hardstyl3r.pas.v1.controller;
 
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import pl.hardstyl3r.pas.v1.dto.AllocationRequest;
 import pl.hardstyl3r.pas.v1.exceptions.ResourceNotFoundException;
 import pl.hardstyl3r.pas.v1.objects.Allocation;
 import pl.hardstyl3r.pas.v1.services.AllocationService;
@@ -34,10 +36,8 @@ public class AllocationController {
 
     @PostMapping
     @PreAuthorize("hasAnyRole('ADMIN', 'RESOURCE_MANAGER')")
-    public ResponseEntity<Allocation> createAllocation(@RequestBody Map<String, String> payload) {
-        String userId = payload.get("userId");
-        String resourceId = payload.get("resourceId");
-        Allocation createdAllocation = allocationService.createAllocation(userId, resourceId);
+    public ResponseEntity<Allocation> createAllocation(@Valid @RequestBody AllocationRequest allocationRequest) {
+        Allocation createdAllocation = allocationService.createAllocation(allocationRequest.userId(), allocationRequest.resourceId());
         return ResponseEntity.ok(createdAllocation);
     }
 

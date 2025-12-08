@@ -35,13 +35,6 @@ public class AllocationService {
     }
 
     public Allocation createAllocation(String userId, String resourceId) {
-        if (userId == null || userId.isBlank()) {
-            throw new InputValidationException("User ID cannot be blank.");
-        }
-        if (resourceId == null || resourceId.isBlank()) {
-            throw new InputValidationException("Resource ID cannot be blank.");
-        }
-
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException("User with id " + userId + " not found."));
 

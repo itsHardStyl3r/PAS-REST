@@ -6,6 +6,9 @@ import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 import org.bson.Document;
 import org.junit.jupiter.api.*;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -13,6 +16,7 @@ import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
+import pl.hardstyl3r.pas.v1.dto.AllocationRequest;
 import pl.hardstyl3r.pas.v1.dto.LoginRequest;
 import pl.hardstyl3r.pas.v1.objects.UserRole;
 import pl.hardstyl3r.pas.v1.objects.resources.Book;
@@ -21,6 +25,7 @@ import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Stream;
 
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.*;
@@ -228,5 +233,29 @@ class AllocationRESTTest {
                 .post("/api/v1/allocations")
                 .then()
                 .statusCode(404);
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideInvalidAllocationRequests")
+    void shouldFailToCreateAllocationWithInvalidData(AllocationRequest request) {
+        given()
+                .header("Authorization", "Bearer " + adminToken)
+                .contentType(ContentType.JSON)
+                .body(request)
+                .when()
+                .post("/api/v1/allocations")
+                .then()
+                .statusCode(400);
+    }
+
+    private static Stream<Arguments> provideInvalidAllocationRequests() {
+        return Stream.of(
+                Arguments.of(new AllocationRequest(null, "resourceId")),
+                Arguments.of(new AllocationRequest("", "resourceId")),
+                Arguments.of(new AllocationRequest("   ", "resourceId")),
+                Arguments.of(new AllocationRequest("userId", null)),
+                Arguments.of(new AllocationRequest("userId", "")),
+                Arguments.of(new AllocationRequest("userId", "   "))
+        );
     }
 }
