@@ -68,4 +68,12 @@ public class UserService {
         user.setName(newName);
         userRepository.update(user);
     }
+
+    public void changePassword(String id, String newPassword) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new UserNotFoundException("User with id " + id + " not found"));
+        user.setPassword(passwordEncoder.encode(newPassword));
+        userRepository.update(user);
+    }
+
 }

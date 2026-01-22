@@ -4,6 +4,7 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import pl.hardstyl3r.pas.v1.dto.EditUserDTO;
 import pl.hardstyl3r.pas.v1.dto.UserConverter;
@@ -93,5 +94,16 @@ public class UserController {
         } catch (IllegalArgumentException e) {
             throw new UserValidationException("Invalid role: " + role);
         }
+    }
+
+    @PatchMapping("/user/password")
+    public ResponseEntity<?> changePassword(@RequestBody String newPassword) {
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        var userOpt = userService.findUserByUsername(username);
+        if (userOpt.isEmpty()) {
+            throw new UserNotFoundException("User with username " + username + " not found");
+        }
+        userService.changePassword(userOpt.get().getId(), newPassword);
+        return ResponseEntity.ok("Password changed successfully.");
     }
 }
