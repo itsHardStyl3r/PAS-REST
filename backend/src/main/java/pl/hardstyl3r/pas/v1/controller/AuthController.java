@@ -15,10 +15,11 @@ import org.springframework.web.bind.annotation.RestController;
 import pl.hardstyl3r.pas.v1.dto.JwtResponse;
 import pl.hardstyl3r.pas.v1.dto.LoginRequest;
 import pl.hardstyl3r.pas.v1.dto.RegisterRequest;
+import pl.hardstyl3r.pas.v1.exceptions.UserNotActiveException;
 import pl.hardstyl3r.pas.v1.exceptions.UsernameIsTakenException;
 import pl.hardstyl3r.pas.v1.objects.User;
-import pl.hardstyl3r.pas.v1.security.JwtUtil;
 import pl.hardstyl3r.pas.v1.services.UserService;
+import pl.hardstyl3r.pas.v1.security.JwtUtil;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -41,14 +42,15 @@ public class AuthController {
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-        String jwt = jwtUtil.generateToken(userDetails);
-
         User user = userService.findUserByUsername(userDetails.getUsername()).get();
+        if (!user.isActive()) {
+            throw new UserNotActiveException(user.getUsername());
+        }
+        String jwt = jwtUtil.generateToken(userDetails);
         String role = userDetails.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
                 .findFirst()
                 .orElse(null);
-
 
         return ResponseEntity.ok(new JwtResponse(jwt, user.getId(), user.getUsername(), role));
     }
