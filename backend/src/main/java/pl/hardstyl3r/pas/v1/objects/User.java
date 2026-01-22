@@ -5,6 +5,7 @@ import jakarta.validation.constraints.Size;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import java.util.Objects;
 
@@ -25,6 +26,7 @@ public class User {
     private boolean active = false;
     private UserRole role = UserRole.CLIENT;
 
+    @JsonIgnore
     @NotBlank(message = "Hasło nie może być puste.")
     @Size(min = 8, message = "Hasło musi mieć co najmniej 8 znaków.")
     private String password;
@@ -92,7 +94,6 @@ public class User {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         User user = (User) o;
-
         return Objects.equals(id, user.id);
     }
 
