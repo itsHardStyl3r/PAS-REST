@@ -114,6 +114,7 @@ class ResourceRESTTest {
     @Test
     void shouldGetResourceById() {
         given()
+                .header("Authorization", "Bearer " + clientToken)
                 .pathParam("id", bookId)
                 .when()
                 .get("/api/v1/resources/{id}")
@@ -184,6 +185,7 @@ class ResourceRESTTest {
                 .statusCode(204);
 
         given()
+                .header("Authorization", "Bearer " + adminToken)
                 .pathParam("id", newspaperId)
                 .when()
                 .get("/api/v1/resources/{id}")
@@ -195,6 +197,7 @@ class ResourceRESTTest {
     void shouldReturn404ForNonExistentResourceOnGet() {
         String nonExistentId = "60c72b2f9b1e8b3b3c8b4567";
         given()
+                .header("Authorization", "Bearer " + clientToken)
                 .pathParam("id", nonExistentId)
                 .when()
                 .get("/api/v1/resources/{id}")
