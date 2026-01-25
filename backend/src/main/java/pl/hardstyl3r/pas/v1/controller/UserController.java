@@ -6,11 +6,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+import pl.hardstyl3r.pas.v1.dto.ChangePasswordRequest;
 import pl.hardstyl3r.pas.v1.dto.EditUserDTO;
 import pl.hardstyl3r.pas.v1.dto.UserConverter;
 import pl.hardstyl3r.pas.v1.dto.UserDTO;
 import pl.hardstyl3r.pas.v1.exceptions.UserNotFoundException;
 import pl.hardstyl3r.pas.v1.exceptions.UserValidationException;
+import pl.hardstyl3r.pas.v1.objects.User;
 import pl.hardstyl3r.pas.v1.objects.UserRole;
 import pl.hardstyl3r.pas.v1.services.UserService;
 
@@ -18,6 +20,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1")
+@CrossOrigin(origins = "http://localhost:5173")
 public class UserController {
 
     private final UserService userService;
@@ -97,13 +100,11 @@ public class UserController {
     }
 
     @PatchMapping("/user/password")
-    public ResponseEntity<?> changePassword(@RequestBody String newPassword) {
+    public ResponseEntity<?> changePassword(@RequestBody ChangePasswordRequest request) {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
-        var userOpt = userService.findUserByUsername(username);
-        if (userOpt.isEmpty()) {
-            throw new UserNotFoundException("User with username " + username + " not found");
-        }
-        userService.changePassword(userOpt.get().getId(), newPassword);
-        return ResponseEntity.ok("Password changed successfully.");
+        User user = userService.findUserByUsername(username)
+                .orElseThrow(() -> new UserNotFoundException("User not found"));
+        userService.changePassword(user.getId(), request.oldPassword(), request.newPassword());
+        return ResponseEntity.ok("Hasło zostało zmienione.");
     }
 }

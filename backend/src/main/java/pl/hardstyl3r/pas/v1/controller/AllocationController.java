@@ -14,6 +14,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/allocations")
+@CrossOrigin(origins = "http://localhost:5173")
 public class AllocationController {
 
     private final AllocationService allocationService;
@@ -35,7 +36,7 @@ public class AllocationController {
     }
 
     @PostMapping
-    @PreAuthorize("hasAnyRole('ADMIN', 'RESOURCE_MANAGER')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'RESOURCE_MANAGER', 'CLIENT')")
     public ResponseEntity<Allocation> createAllocation(@Valid @RequestBody AllocationRequest allocationRequest) {
         Allocation createdAllocation = allocationService.createAllocation(allocationRequest.userId(), allocationRequest.resourceId());
         return ResponseEntity.ok(createdAllocation);

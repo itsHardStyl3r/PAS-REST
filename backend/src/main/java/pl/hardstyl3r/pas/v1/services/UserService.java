@@ -69,9 +69,12 @@ public class UserService {
         userRepository.update(user);
     }
 
-    public void changePassword(String id, String newPassword) {
+    public void changePassword(String id, String oldPassword, String newPassword) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException("User with id " + id + " not found"));
+        if (!passwordEncoder.matches(oldPassword, user.getPassword())) {
+            throw new UserValidationException("Obecne hasło jest niepoprawne.");
+        }
         user.setPassword(passwordEncoder.encode(newPassword));
         userRepository.update(user);
     }

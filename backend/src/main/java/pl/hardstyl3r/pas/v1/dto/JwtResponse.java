@@ -2,13 +2,15 @@ package pl.hardstyl3r.pas.v1.dto;
 
 public class JwtResponse {
     private String token;
+    private String refreshToken;
     private String type = "Bearer";
     private String id;
     private String username;
     private String role;
 
-    public JwtResponse(String token, String id, String username, String role) {
+    public JwtResponse(String token,String refreshToken, String id, String username, String role) {
         this.token = token;
+        this.refreshToken = refreshToken;
         this.id = id;
         this.username = username;
         this.role = role;
@@ -21,6 +23,10 @@ public class JwtResponse {
     public void setToken(String token) {
         this.token = token;
     }
+
+    public String getRefreshToken() {return refreshToken;}
+
+    public void setRefreshToken(String refreshToken) {this.refreshToken = refreshToken;}
 
     public String getType() {
         return type;
