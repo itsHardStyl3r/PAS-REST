@@ -85,7 +85,7 @@ class UserRESTTest {
                 .contentType(ContentType.JSON)
                 .body(loginRequest)
                 .when()
-                .post("/api/auth/login")
+                .post("/api/v1/auth/login")
                 .then()
                 .statusCode(200)
                 .extract().response();
@@ -99,7 +99,7 @@ class UserRESTTest {
                 .contentType(ContentType.JSON)
                 .body(newUser)
                 .when()
-                .post("/api/auth/register")
+                .post("/api/v1/auth/register")
                 .then()
                 .statusCode(200);
 
@@ -123,7 +123,7 @@ class UserRESTTest {
                 .contentType(ContentType.JSON)
                 .body(request)
                 .when()
-                .post("/api/auth/register")
+                .post("/api/v1/auth/register")
                 .then()
                 .statusCode(400);
     }
@@ -146,9 +146,9 @@ class UserRESTTest {
                 .contentType(ContentType.JSON)
                 .body(request)
                 .when()
-                .post("/api/auth/login")
+                .post("/api/v1/auth/login")
                 .then()
-                .statusCode(400);
+                .statusCode(403);
     }
 
     private static Stream<Arguments> provideInvalidLoginRequests() {
@@ -254,7 +254,7 @@ class UserRESTTest {
                 .contentType(ContentType.JSON)
                 .body(existingUser)
                 .when()
-                .post("/api/auth/register")
+                .post("/api/v1/auth/register")
                 .then()
                 .statusCode(409);
     }

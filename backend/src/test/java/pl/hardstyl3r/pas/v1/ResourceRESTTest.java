@@ -94,7 +94,7 @@ class ResourceRESTTest {
                 .contentType(ContentType.JSON)
                 .body(loginRequest)
                 .when()
-                .post("/api/auth/login")
+                .post("/api/v1/auth/login")
                 .then()
                 .statusCode(200)
                 .extract().response();
