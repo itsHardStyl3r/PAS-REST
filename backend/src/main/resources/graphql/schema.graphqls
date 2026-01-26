@@ -1,0 +1,24 @@
+type Query {
+    users(filter: UserFilter): [UserDTO]
+}
+
+input UserFilter {
+    username: String
+    name: String
+    active: Boolean
+    role: UserRole
+}
+
+type UserDTO {
+    id: ID!
+    username: String!
+    name: String!
+    active: Boolean!
+    role: UserRole!
+}
+
+enum UserRole {
+    CLIENT
+    RESOURCE_MANAGER
+    ADMIN
+}

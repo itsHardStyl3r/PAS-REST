@@ -1,0 +1,101 @@
+package pl.hardstyl3r.pas.v1;
+
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.model.Filters;
+import io.restassured.RestAssured;
+import io.restassured.http.ContentType;
+import io.restassured.response.Response;
+import org.bson.Document;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.test.context.ActiveProfiles;
+import pl.hardstyl3r.pas.v1.dto.LoginRequest;
+import pl.hardstyl3r.pas.v1.objects.UserRole;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.Objects;
+
+import static io.restassured.RestAssured.given;
+import static org.hamcrest.Matchers.*;
+
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@ActiveProfiles("test")
+public class UserGraphQLIntegrationTest {
+
+    @LocalServerPort
+    private int port;
+    @Autowired
+    private MongoTemplate mongoTemplate;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+    @Value("${pas.mongodb.collection.users}")
+    private String collectionName;
+    private String aniaId;
+    private String marekId;
+    private String adminToken;
+
+    @BeforeEach
+    void setup() {
+        RestAssured.port = port;
+
+        mongoTemplate.dropCollection(collectionName);
+        MongoCollection<Document> usersCollection = mongoTemplate.createCollection(collectionName);
+
+        Document admin = new Document("username", "admin").append("name", "Admin").append("active", true).append("password", passwordEncoder.encode("password")).append("role", UserRole.ADMIN.name());
+        Document ania = new Document("username", "anna").append("name", "Ania").append("active", true).append("password", passwordEncoder.encode("password")).append("role", UserRole.CLIENT.name());
+        Document marek = new Document("username", "marek").append("name", "Marek").append("active", true).append("password", passwordEncoder.encode("password")).append("role", UserRole.CLIENT.name());
+        Document testuser = new Document("username", "testuser").append("name", "Test User").append("active", true).append("password", passwordEncoder.encode("password")).append("role", UserRole.CLIENT.name());
+        usersCollection.insertMany(Arrays.asList(admin, ania, marek, testuser));
+
+        this.aniaId = Objects.requireNonNull(usersCollection.find(Filters.eq("username", "anna")).first()).getObjectId("_id").toHexString();
+        this.marekId = Objects.requireNonNull(usersCollection.find(Filters.eq("username", "marek")).first()).getObjectId("_id").toHexString();
+
+        adminToken = loginAndGetToken("admin", "password");
+    }
+
+    private String loginAndGetToken(String username, String password) {
+        LoginRequest loginRequest = new LoginRequest(username, password);
+        Response response = given()
+                .contentType(ContentType.JSON)
+                .body(loginRequest)
+                .when()
+                .post("/api/auth/login")
+                .then()
+                .statusCode(200)
+                .extract().response();
+        return response.jsonPath().getString("token");
+    }
+
+    @Test
+    public void testSearchUsersWithFilters() {
+        String query = """
+            {
+                users(filter: {username: "test", active: true, role: CLIENT}) {
+                    id
+                    username
+                    name
+                    active
+                    role
+                }
+            }
+            """;
+
+        given()
+                .contentType(ContentType.JSON)
+                .body("{\"query\":\"" + query.replace("\n", "").replace("\"", "\\\"") + "\"}")
+                .when()
+                .post("/graphql")
+                .then()
+                .statusCode(200)
+                .body("data.users", not(empty()))
+                .body("data.users[0].username", containsString("test"))
+                .body("data.users[0].active", equalTo(true));
+    }
+}
