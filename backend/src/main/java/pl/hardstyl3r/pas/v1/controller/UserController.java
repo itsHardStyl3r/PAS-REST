@@ -2,6 +2,7 @@ package pl.hardstyl3r.pas.v1.controller;
 
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -14,27 +15,35 @@ import pl.hardstyl3r.pas.v1.exceptions.UserNotFoundException;
 import pl.hardstyl3r.pas.v1.exceptions.UserValidationException;
 import pl.hardstyl3r.pas.v1.objects.User;
 import pl.hardstyl3r.pas.v1.objects.UserRole;
+import pl.hardstyl3r.pas.v1.security.JwtUtil;
 import pl.hardstyl3r.pas.v1.services.UserService;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1")
-@CrossOrigin(origins = "http://localhost:5173")
+@CrossOrigin(origins = "http://localhost:5173", exposedHeaders = "ETag")
 public class UserController {
 
     private final UserService userService;
+    private final JwtUtil jwtUtil;
 
     @Autowired
-    public UserController(UserService userService) {
+    public UserController(UserService userService, JwtUtil jwtUtil) {
         this.userService = userService;
+        this.jwtUtil = jwtUtil;
     }
 
     @GetMapping("/user/id/{id}")
-    public UserDTO getUserById(@PathVariable String id) {
-        return userService.findUserById(id)
-                .map(UserConverter::dtoFromUser)
+    public ResponseEntity<UserDTO> getUserById(@PathVariable String id) {
+        User user = userService.findUserById(id)
                 .orElseThrow(() -> new UserNotFoundException("User with id " + id + " not found"));
+
+        String etag = jwtUtil.generateValueSignature(user.getId());
+
+        return ResponseEntity.ok()
+                .header("ETag", etag)
+                .body(UserConverter.dtoFromUser(user));
     }
 
     @GetMapping("/user/username/{username}")
@@ -79,12 +88,26 @@ public class UserController {
     }
 
     @PatchMapping("/user/id/{id}/rename")
-    @PreAuthorize("hasRole('ADMIN')")
-    public void renameUser(@PathVariable String id, @Valid @RequestBody EditUserDTO userDTO) {
-        if (userService.findUserById(id).isEmpty()) {
-            throw new UserNotFoundException("User with id " + id + " not found");
+    @PreAuthorize("hasAnyRole('ADMIN', 'CLIENT')")
+    public ResponseEntity<Void> renameUser(
+            @PathVariable String id,
+            @Valid @RequestBody EditUserDTO userDTO,
+            @RequestHeader(value = "If-Match", required = false) String ifMatch) {
+
+        if (ifMatch == null || ifMatch.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.PRECONDITION_REQUIRED).build();
         }
+
+        User user = userService.findUserById(id)
+                .orElseThrow(() -> new UserNotFoundException("User not found"));
+
+        if (!jwtUtil.verifyValueSignature(user.getId(), ifMatch)) {
+            return ResponseEntity.status(HttpStatus.PRECONDITION_FAILED).build();
+        }
+
         userService.renameUserById(id, userDTO.name());
+
+        return ResponseEntity.noContent().build();
     }
 
     @PutMapping("/user/{id}/role")
