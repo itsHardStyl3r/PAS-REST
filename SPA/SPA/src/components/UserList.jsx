@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import api from '../api/axios';
 
 const UserList = ({ onSelectUser }) => {
@@ -7,12 +7,11 @@ const UserList = ({ onSelectUser }) => {
     const [loading, setLoading] = useState(false);
     const [newUser, setNewUser] = useState({ username: '', password: '', name: '' });
     const [message, setMessage] = useState({ text: '', isError: false });
-
+    
     const fetchUsers = async () => {
         setLoading(true);
         try {
-            const endpoint = searchTerm ? `/user/search/${searchTerm}` : '/users';
-            const response = await api.get(endpoint);
+            const response = await api.get('/users');
             setUsers(response.data);
         } catch (error) {
             console.error("Błąd podczas pobierania użytkowników:", error);
@@ -22,16 +21,19 @@ const UserList = ({ onSelectUser }) => {
     };
 
     useEffect(() => {
-        const delayDebounceFn = setTimeout(() => {
-            fetchUsers();
-        }, 300);
-        return () => clearTimeout(delayDebounceFn);
-    }, [searchTerm]);
+        fetchUsers();
+    }, []);
+
+    const filteredUsers = useMemo(() => {
+        return users.filter((user) =>
+            user.username.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            user.name?.toLowerCase().includes(searchTerm.toLowerCase())
+        );
+    }, [users, searchTerm]);
 
     const handleRegister = async (e) => {
         e.preventDefault();
 
-        // Sprawdzanie czy użytkownik o takim username już istnieje w aktualnym stanie 'users'
         const userExists = users.some(
             (u) => u.username.toLowerCase() === newUser.username.toLowerCase()
         );
@@ -178,10 +180,10 @@ const UserList = ({ onSelectUser }) => {
                         </tr>
                         </thead>
                         <tbody>
-                        {loading ? (
+                        {loading && users.length === 0 ? (
                             <tr><td colSpan="4" className="text-center py-4">Ładowanie...</td></tr>
                         ) : (
-                            users.map((user) => (
+                            filteredUsers.map((user) => (
                                 <tr key={user.id}>
                                     <td className="fw-bold">{user.username}</td>
                                     <td>
@@ -217,6 +219,9 @@ const UserList = ({ onSelectUser }) => {
                                     </td>
                                 </tr>
                             ))
+                        )}
+                        {!loading && filteredUsers.length === 0 && (
+                            <tr><td colSpan="4" className="text-center py-4 text-muted">Brak wyników dla "{searchTerm}"</td></tr>
                         )}
                         </tbody>
                     </table>
