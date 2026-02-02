@@ -31,6 +31,16 @@ const UserList = ({ onSelectUser }) => {
     const handleRegister = async (e) => {
         e.preventDefault();
 
+        // Sprawdzanie czy użytkownik o takim username już istnieje w aktualnym stanie 'users'
+        const userExists = users.some(
+            (u) => u.username.toLowerCase() === newUser.username.toLowerCase()
+        );
+
+        if (userExists) {
+            setMessage({ text: 'Taki użytkownik już istnieje na liście.', isError: true });
+            return;
+        }
+
         if (newUser.username.length < 3) {
             setMessage({ text: 'Username musi mieć minimum 3 znaki.', isError: true });
             return;
