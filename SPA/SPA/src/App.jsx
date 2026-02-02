@@ -52,7 +52,6 @@ function App() {
                 </button>
               )}
 
-              {/* NOWA ZAKŁADKA PROFIL */}
               <button 
                 className={`nav-link btn btn-link border-0 me-2 ${activeTab === 'profile' ? 'active fw-bold' : ''}`}
                 onClick={() => { setActiveTab('profile'); setSelectedUserId(null); }}
