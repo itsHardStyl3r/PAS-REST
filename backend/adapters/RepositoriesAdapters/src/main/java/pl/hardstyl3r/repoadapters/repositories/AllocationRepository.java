@@ -1,4 +1,4 @@
-package pl.hardstyl3r.pas.v1.repositories;
+package pl.hardstyl3r.repoadapters.repositories;
 
 import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.core.MongoTemplate;
