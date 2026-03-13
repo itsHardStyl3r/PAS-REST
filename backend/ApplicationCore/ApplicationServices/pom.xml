@@ -9,4 +9,16 @@
     </parent>
 
     <artifactId>ApplicationServices</artifactId>
+
+    <dependencies>
+        <dependency>
+            <groupId>pl.hardstyl3r</groupId>
+            <artifactId>ApplicationPorts</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter</artifactId>
+        </dependency>
+    </dependencies>
 </project>

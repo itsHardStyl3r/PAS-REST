@@ -25,10 +25,9 @@
 
     <dependencies>
         <dependency>
-            <groupId>pl.hardstyl3r</groupId>
-            <artifactId>RepositoriesAdapters</artifactId>
-            <version>0.1-SNAPSHOT</version>
-            <scope>compile</scope>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-validation</artifactId>
+            <version>3.5.7</version>
         </dependency>
     </dependencies>
 </project>
