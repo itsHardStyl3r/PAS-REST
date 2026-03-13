@@ -1,14 +1,9 @@
 package pl.hardstyl3r.pas.v1.objects;
 
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
-
 import java.time.LocalDateTime;
 import java.util.Objects;
 
-@Document(collection = "#{@environment.getProperty('pas.mongodb.collection.allocations')}")
 public class Allocation {
-    @Id
     private String id;
     private String userId;
     private String resourceId;
