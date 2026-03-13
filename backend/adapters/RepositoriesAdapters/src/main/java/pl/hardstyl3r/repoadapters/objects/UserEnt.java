@@ -1,6 +1,5 @@
 package pl.hardstyl3r.repoadapters.objects;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import org.springframework.data.annotation.Id;
@@ -26,7 +25,6 @@ public class UserEnt {
     private boolean active = false;
     private UserEntRole role = UserEntRole.CLIENT;
 
-    @JsonIgnore
     @NotBlank(message = "Hasło nie może być puste.")
     @Size(min = 8, message = "Hasło musi mieć co najmniej 8 znaków.")
     private String password;
