@@ -9,10 +9,12 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>pl.hardstyl3r</groupId>
-    <artifactId>ApplicationCore</artifactId>
-    <version>0.0.9-SNAPSHOT</version>
-    <name>SpringRest</name>
-    <description>REST application</description>
+    <artifactId>backend</artifactId>
+    <version>0.1-SNAPSHOT</version>
+    <packaging>pom</packaging>
+    <modules>
+        <module>ApplicationCore</module>
+    </modules>
     <url/>
     <licenses>
         <license>
