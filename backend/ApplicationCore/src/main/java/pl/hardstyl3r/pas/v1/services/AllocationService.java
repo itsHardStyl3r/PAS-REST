@@ -2,11 +2,11 @@ package pl.hardstyl3r.pas.v1.services;
 
 import org.springframework.stereotype.Service;
 import pl.hardstyl3r.pas.v1.exceptions.*;
-import pl.hardstyl3r.pas.v1.objects.Allocation;
-import pl.hardstyl3r.pas.v1.objects.User;
 import pl.hardstyl3r.pas.v1.repositories.AllocationRepository;
 import pl.hardstyl3r.pas.v1.repositories.ResourceRepository;
 import pl.hardstyl3r.pas.v1.repositories.UserRepository;
+import pl.hardstyl3r.repoadapters.objects.AllocationEnt;
+import pl.hardstyl3r.repoadapters.objects.UserEnt;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -26,16 +26,16 @@ public class AllocationService {
         this.resourceRepository = resourceRepository;
     }
 
-    public List<Allocation> findAll() {
+    public List<AllocationEnt> findAll() {
         return allocationRepository.findAll();
     }
 
-    public Optional<Allocation> findById(String id) {
+    public Optional<AllocationEnt> findById(String id) {
         return allocationRepository.findById(id);
     }
 
-    public Allocation createAllocation(String userId, String resourceId) {
-        User user = userRepository.findById(userId)
+    public AllocationEnt createAllocation(String userId, String resourceId) {
+        UserEnt user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException("User with id " + userId + " not found."));
 
         if (!user.isActive()) {
@@ -49,15 +49,15 @@ public class AllocationService {
             throw new ResourceInUseException("Cannot create allocation. Resource with id " + resourceId + " is already allocated.");
         }
 
-        Allocation allocation = new Allocation(userId, resourceId);
+        AllocationEnt allocation = new AllocationEnt(userId, resourceId);
         return allocationRepository.save(allocation);
     }
 
-    public Allocation endAllocation(String id) {
+    public AllocationEnt endAllocation(String id) {
         if (id == null || id.isBlank()) {
             throw new InputValidationException("Allocation ID cannot be blank.");
         }
-        Allocation allocation = allocationRepository.findById(id)
+        AllocationEnt allocation = allocationRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Allocation with id " + id + " not found."));
 
         if (allocation.getEndTime() != null) {
@@ -72,7 +72,7 @@ public class AllocationService {
         if (id == null || id.isBlank()) {
             throw new InputValidationException("Allocation ID cannot be blank.");
         }
-        Allocation allocation = allocationRepository.findById(id)
+        AllocationEnt allocation = allocationRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Allocation with id " + id + " not found."));
 
         if (allocation.getEndTime() != null) {
@@ -81,7 +81,7 @@ public class AllocationService {
         allocationRepository.deleteById(id);
     }
 
-    public List<Allocation> getCurrentAllocationsForUser(String userId) {
+    public List<AllocationEnt> getCurrentAllocationsForUser(String userId) {
         if (userId == null || userId.isBlank()) {
             throw new InputValidationException("User ID cannot be blank.");
         }
@@ -90,7 +90,7 @@ public class AllocationService {
                 .collect(Collectors.toList());
     }
 
-    public List<Allocation> getPastAllocationsForUser(String userId) {
+    public List<AllocationEnt> getPastAllocationsForUser(String userId) {
         if (userId == null || userId.isBlank()) {
             throw new InputValidationException("User ID cannot be blank.");
         }
@@ -99,7 +99,7 @@ public class AllocationService {
                 .collect(Collectors.toList());
     }
 
-    public List<Allocation> getCurrentAllocationsForResource(String resourceId) {
+    public List<AllocationEnt> getCurrentAllocationsForResource(String resourceId) {
         if (resourceId == null || resourceId.isBlank()) {
             throw new InputValidationException("Resource ID cannot be blank.");
         }
@@ -108,7 +108,7 @@ public class AllocationService {
                 .collect(Collectors.toList());
     }
 
-    public List<Allocation> getPastAllocationsForResource(String resourceId) {
+    public List<AllocationEnt> getPastAllocationsForResource(String resourceId) {
         if (resourceId == null || resourceId.isBlank()) {
             throw new InputValidationException("Resource ID cannot be blank.");
         }

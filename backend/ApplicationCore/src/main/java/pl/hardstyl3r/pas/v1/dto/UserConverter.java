@@ -1,12 +1,13 @@
 package pl.hardstyl3r.pas.v1.dto;
 
-import pl.hardstyl3r.pas.v1.objects.User;
+
+import pl.hardstyl3r.repoadapters.objects.UserEnt;
 
 import java.util.List;
 
 public class UserConverter {
 
-    public static UserDTO dtoFromUser(User user) {
+    public static UserDTO dtoFromUser(UserEnt user) {
         return new UserDTO(
                 user.getId(),
                 user.getUsername(),
@@ -16,7 +17,7 @@ public class UserConverter {
         );
     }
 
-    public static List<UserDTO> dtoFromUsers(List<User> users) {
+    public static List<UserDTO> dtoFromUsers(List<UserEnt> users) {
         return users.stream()
                 .map(UserConverter::dtoFromUser)
                 .toList();

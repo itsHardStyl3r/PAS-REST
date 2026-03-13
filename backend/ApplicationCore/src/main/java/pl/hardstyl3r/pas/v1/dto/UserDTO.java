@@ -1,9 +1,9 @@
 package pl.hardstyl3r.pas.v1.dto;
 
-import pl.hardstyl3r.pas.v1.objects.UserRole;
+import pl.hardstyl3r.repoadapters.objects.UserEntRole;
 
-public record UserDTO(String id, String username, String name, boolean active, UserRole role) {
-    public UserDTO(String id, String username, String name, boolean active, UserRole role) {
+public record UserDTO(String id, String username, String name, boolean active, UserEntRole role) {
+    public UserDTO(String id, String username, String name, boolean active, UserEntRole role) {
         this.id = id;
         this.username = username;
         this.name = name;
@@ -30,7 +30,7 @@ public record UserDTO(String id, String username, String name, boolean active, U
         return active;
     }
 
-    public UserRole role() {
+    public UserEntRole role() {
         return role;
     }
 }

@@ -5,20 +5,18 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import pl.hardstyl3r.pas.v1.dto.JwtResponse;
 import pl.hardstyl3r.pas.v1.dto.LoginRequest;
 import pl.hardstyl3r.pas.v1.dto.RegisterRequest;
-import pl.hardstyl3r.pas.v1.exceptions.UserNotActiveException;
 import pl.hardstyl3r.pas.v1.exceptions.UserNotFoundException;
 import pl.hardstyl3r.pas.v1.exceptions.UsernameIsTakenException;
-import pl.hardstyl3r.pas.v1.objects.User;
 import pl.hardstyl3r.pas.v1.security.UserDetailsServiceImpl;
 import pl.hardstyl3r.pas.v1.services.UserService;
 import pl.hardstyl3r.pas.v1.security.JwtUtil;
+import pl.hardstyl3r.repoadapters.objects.UserEnt;
 
 import java.util.Map;
 
@@ -51,7 +49,7 @@ public class AuthController {
         String jwt = jwtUtil.generateToken(userDetails);
         String refreshToken = jwtUtil.generateRefreshToken(userDetails);
 
-        User user = userService.findUserByUsername(userDetails.getUsername())
+        UserEnt user = userService.findUserByUsername(userDetails.getUsername())
                 .orElseThrow(() -> new RuntimeException("Error: User is not found."));
 
         return ResponseEntity.ok(new JwtResponse(jwt, refreshToken, user.getId(), user.getUsername(), user.getRole().name()));
@@ -63,7 +61,7 @@ public class AuthController {
             throw new UsernameIsTakenException(registerRequest.username());
         }
 
-        User user = new User(registerRequest.username(), registerRequest.password(), registerRequest.name(), false);
+        UserEnt user = new UserEnt(registerRequest.username(), registerRequest.password(), registerRequest.name(), false);
         userService.registerUser(user);
         return ResponseEntity.ok("User registered successfully!");
     }
@@ -83,7 +81,7 @@ public class AuthController {
             if (jwtUtil.isTokenValid(refreshToken, userDetails)) {
                 String newAccessToken = jwtUtil.generateToken(userDetails);
 
-                User user = userService.findUserByUsername(userDetails.getUsername())
+                UserEnt user = userService.findUserByUsername(userDetails.getUsername())
                         .orElseThrow(() -> new UserNotFoundException("User not found"));
 
                 return ResponseEntity.ok(new JwtResponse(newAccessToken, refreshToken, user.getId(), user.getUsername(), user.getRole().name()));

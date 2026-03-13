@@ -1,4 +1,4 @@
-package pl.hardstyl3r.objects;
+package pl.hardstyl3r.repoadapters.objects;
 
 public enum UserEntRole {
     CLIENT,

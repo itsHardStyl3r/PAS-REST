@@ -1,4 +1,4 @@
-package pl.hardstyl3r.objects.resources;
+package pl.hardstyl3r.repoadapters.objects.resources;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;

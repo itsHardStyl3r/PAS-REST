@@ -6,8 +6,8 @@ import org.springframework.web.bind.annotation.*;
 import pl.hardstyl3r.pas.v1.dto.CreateResourceDTO;
 import pl.hardstyl3r.pas.v1.dto.EditResourceDTO;
 import pl.hardstyl3r.pas.v1.exceptions.ResourceNotFoundException;
-import pl.hardstyl3r.pas.v1.objects.resources.Resource;
 import pl.hardstyl3r.pas.v1.services.ResourceService;
+import pl.hardstyl3r.repoadapters.objects.resources.ResourceEnt;
 
 import java.util.List;
 
@@ -23,27 +23,27 @@ public class ResourceController {
     }
 
     @GetMapping
-    public List<Resource> getAllResources() {
+    public List<ResourceEnt> getAllResources() {
         return resourceService.findAll();
     }
 
     @GetMapping("/{id}")
-    public Resource getResourceById(@PathVariable String id) {
+    public ResourceEnt getResourceById(@PathVariable String id) {
         return resourceService.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Resource with id " + id + " not found."));
     }
 
     @PostMapping
     @PreAuthorize("hasAnyRole('ADMIN', 'RESOURCE_MANAGER')")
-    public ResponseEntity<Resource> createResource(@RequestBody CreateResourceDTO createResourceDTO) {
-        Resource createdResource = resourceService.createResource(createResourceDTO);
+    public ResponseEntity<ResourceEnt> createResource(@RequestBody CreateResourceDTO createResourceDTO) {
+        ResourceEnt createdResource = resourceService.createResource(createResourceDTO);
         return ResponseEntity.ok(createdResource);
     }
 
     @PutMapping("/{id}")
     @PreAuthorize("hasAnyRole('ADMIN', 'RESOURCE_MANAGER')")
-    public ResponseEntity<Resource> editResource(@PathVariable String id, @RequestBody EditResourceDTO editResourceDTO) {
-        Resource editedResource = resourceService.updateResource(id, editResourceDTO);
+    public ResponseEntity<ResourceEnt> editResource(@PathVariable String id, @RequestBody EditResourceDTO editResourceDTO) {
+        ResourceEnt editedResource = resourceService.updateResource(id, editResourceDTO);
         return ResponseEntity.ok(editedResource);
     }
 

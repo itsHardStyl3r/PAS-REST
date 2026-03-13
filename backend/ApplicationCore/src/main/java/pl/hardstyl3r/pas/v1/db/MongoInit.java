@@ -17,13 +17,11 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
-import pl.hardstyl3r.pas.v1.objects.Allocation;
-import pl.hardstyl3r.pas.v1.objects.User;
-import pl.hardstyl3r.pas.v1.objects.UserRole;
-import pl.hardstyl3r.pas.v1.objects.resources.Book;
-import pl.hardstyl3r.pas.v1.objects.resources.Newspaper;
-import pl.hardstyl3r.pas.v1.objects.resources.Periodical;
-import pl.hardstyl3r.pas.v1.objects.resources.Resource;
+import pl.hardstyl3r.repoadapters.objects.*;
+import pl.hardstyl3r.repoadapters.objects.resources.BookEnt;
+import pl.hardstyl3r.repoadapters.objects.resources.NewspaperEnt;
+import pl.hardstyl3r.repoadapters.objects.resources.PeriodicalEnt;
+import pl.hardstyl3r.repoadapters.objects.resources.ResourceEnt;
 import pl.hardstyl3r.pas.v1.repositories.AllocationRepository;
 import pl.hardstyl3r.pas.v1.repositories.ResourceRepository;
 import pl.hardstyl3r.pas.v1.repositories.UserRepository;
@@ -102,35 +100,35 @@ public class MongoInit implements CommandLineRunner {
         MongoCollection<Document> usersCollection = mongoTemplate.getCollection(usersCollectionName);
         usersCollection.createIndex(Indexes.ascending("username"), new IndexOptions().unique(true));
 
-        User rwalczak = new User("rwalczak", passwordEncoder.encode("password"), "Rafał Walczak", false);
+        UserEnt rwalczak = new UserEnt("rwalczak", passwordEncoder.encode("password"), "Rafał Walczak", false);
         rwalczak.setId("60c72b2f9b1e8a3f3c8e4b1a");
-        rwalczak.setRole(UserRole.CLIENT);
+        rwalczak.setRole(UserEntRole.CLIENT);
 
-        User ewisniewska = new User("ewisniewska", passwordEncoder.encode("password"), "Edyta Wiśniewska", true);
+        UserEnt ewisniewska = new UserEnt("ewisniewska", passwordEncoder.encode("password"), "Edyta Wiśniewska", true);
         ewisniewska.setId("60c72b2f9b1e8a3f3c8e4b1b");
-        ewisniewska.setRole(UserRole.CLIENT);
+        ewisniewska.setRole(UserEntRole.CLIENT);
 
-        User zchmielewska = new User("zchmielewska", passwordEncoder.encode("password"), "Zofia Chmielewska", true);
+        UserEnt zchmielewska = new UserEnt("zchmielewska", passwordEncoder.encode("password"), "Zofia Chmielewska", true);
         zchmielewska.setId("60c72b2f9b1e8a3f3c8e4b1c");
-        zchmielewska.setRole(UserRole.CLIENT);
+        zchmielewska.setRole(UserEntRole.CLIENT);
 
-        User ksawicka = new User("ksawicka", passwordEncoder.encode("password"), "Kinga Sawicka", true);
+        UserEnt ksawicka = new UserEnt("ksawicka", passwordEncoder.encode("password"), "Kinga Sawicka", true);
         ksawicka.setId("60c72b2f9b1e8a3f3c8e4b1d");
-        ksawicka.setRole(UserRole.CLIENT);
+        ksawicka.setRole(UserEntRole.CLIENT);
 
-        User mzawadzki = new User("mzawadzki", passwordEncoder.encode("password"), "Mieczysław Zawadzki", false);
+        UserEnt mzawadzki = new UserEnt("mzawadzki", passwordEncoder.encode("password"), "Mieczysław Zawadzki", false);
         mzawadzki.setId("60c72b2f9b1e8a3f3c8e4b1e");
-        mzawadzki.setRole(UserRole.CLIENT);
+        mzawadzki.setRole(UserEntRole.CLIENT);
 
-        User admin = new User("admin", passwordEncoder.encode("password"), "Admin User", true);
+        UserEnt admin = new UserEnt("admin", passwordEncoder.encode("password"), "Admin User", true);
         admin.setId("60c72b2f9b1e8a3f3c8e4b1f");
-        admin.setRole(UserRole.ADMIN);
+        admin.setRole(UserEntRole.ADMIN);
 
-        User resourceManager = new User("resource", passwordEncoder.encode("password"), "Resource Manager", true);
+        UserEnt resourceManager = new UserEnt("resource", passwordEncoder.encode("password"), "Resource Manager", true);
         resourceManager.setId("60c72b2f9b1e8a3f3c8e4b20");
-        resourceManager.setRole(UserRole.RESOURCE_MANAGER);
+        resourceManager.setRole(UserEntRole.RESOURCE_MANAGER);
 
-        List<User> users = Arrays.asList(rwalczak, ewisniewska, zchmielewska, ksawicka, mzawadzki, admin, resourceManager);
+        List<UserEnt> users = Arrays.asList(rwalczak, ewisniewska, zchmielewska, ksawicka, mzawadzki, admin, resourceManager);
 
         users.forEach(userRepository::save);
         logger.info("Database has been initialized with {} users.", users.size());
@@ -147,11 +145,11 @@ public class MongoInit implements CommandLineRunner {
         );
         createCollectionWithSchemaValidation(resourcesCollectionName, resourceSchema);
 
-        List<Resource> resources = Arrays.asList(
-                new Book("60c72b2f9b1e8a3f3c8e4b2a", "Morderstwo w Orient Expressie", "Herkules Poirot po rozwiązaniu sprawy kryminalnej w Azji wraca do Europy.", "Agatha Christie", "9788327159779"),
-                new Book("60c72b2f9b1e8a3f3c8e4b2b", "Poirot prowadzi śledztwo", "Herkules Poirot łapie przestępców, choć jego samego złapała grypa.", "Agatha Christie", "9788327157188"),
-                new Periodical("60c72b2f9b1e8a3f3c8e4b2c", "CD-Action", "Magazyn o grach komputerowych", 320),
-                new Newspaper("60c72b2f9b1e8a3f3c8e4b2d", "Gazeta Wyborcza", "Gazeta", "2025-11-17")
+        List<ResourceEnt> resources = Arrays.asList(
+                new BookEnt("60c72b2f9b1e8a3f3c8e4b2a", "Morderstwo w Orient Expressie", "Herkules Poirot po rozwiązaniu sprawy kryminalnej w Azji wraca do Europy.", "Agatha Christie", "9788327159779"),
+                new BookEnt("60c72b2f9b1e8a3f3c8e4b2b", "Poirot prowadzi śledztwo", "Herkules Poirot łapie przestępców, choć jego samego złapała grypa.", "Agatha Christie", "9788327157188"),
+                new PeriodicalEnt("60c72b2f9b1e8a3f3c8e4b2c", "CD-Action", "Magazyn o grach komputerowych", 320),
+                new NewspaperEnt("60c72b2f9b1e8a3f3c8e4b2d", "Gazeta Wyborcza", "Gazeta", "2025-11-17")
         );
 
         resources.forEach(resourceRepository::save);
@@ -171,12 +169,12 @@ public class MongoInit implements CommandLineRunner {
         );
         createCollectionWithSchemaValidation(allocationsCollectionName, allocationSchema);
 
-        Allocation activeAllocation = new Allocation("60c72b2f9b1e8a3f3c8e4b1d", "60c72b2f9b1e8a3f3c8e4b2c");
+        AllocationEnt activeAllocation = new AllocationEnt("60c72b2f9b1e8a3f3c8e4b1d", "60c72b2f9b1e8a3f3c8e4b2c");
         activeAllocation.setId("692c9fe56f86670cdd4f55f0");
         activeAllocation.setStartTime(LocalDateTime.now().minusDays(1));
         allocationRepository.save(activeAllocation);
 
-        Allocation pastAllocation = new Allocation("60c72b2f9b1e8a3f3c8e4b1a", "60c72b2f9b1e8a3f3c8e4b2a");
+        AllocationEnt pastAllocation = new AllocationEnt("60c72b2f9b1e8a3f3c8e4b1a", "60c72b2f9b1e8a3f3c8e4b2a");
         pastAllocation.setId("692c9fe56f86670cdd4f55f1");
         pastAllocation.setStartTime(LocalDateTime.now().minusDays(10));
         pastAllocation.setEndTime(LocalDateTime.now().minusDays(5));

@@ -4,9 +4,8 @@ import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
-import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Repository;
-import pl.hardstyl3r.pas.v1.objects.User;
+import pl.hardstyl3r.repoadapters.objects.UserEnt;
 
 import java.util.List;
 import java.util.Optional;
@@ -21,45 +20,45 @@ public class UserRepository {
         this.mongoTemplate = mongoTemplate;
     }
 
-    public List<User> findAll() {
-        return mongoTemplate.findAll(User.class);
+    public List<UserEnt> findAll() {
+        return mongoTemplate.findAll(UserEnt.class);
     }
 
-    public Optional<User> findById(String id) {
+    public Optional<UserEnt> findById(String id) {
         if (!ObjectId.isValid(id)) {
             return Optional.empty();
         }
-        return Optional.ofNullable(mongoTemplate.findById(id, User.class));
+        return Optional.ofNullable(mongoTemplate.findById(id, UserEnt.class));
     }
 
-    public Optional<User> findByUsername(String username) {
+    public Optional<UserEnt> findByUsername(String username) {
         Query query = new Query(Criteria.where("username").is(username));
-        return Optional.ofNullable(mongoTemplate.findOne(query, User.class));
+        return Optional.ofNullable(mongoTemplate.findOne(query, UserEnt.class));
     }
 
     public boolean existsByUsername(String username) {
         Query query = new Query(Criteria.where("username").is(username));
-        return mongoTemplate.exists(query, User.class);
+        return mongoTemplate.exists(query, UserEnt.class);
     }
 
-    public User save(User user) {
+    public UserEnt save(UserEnt user) {
         return mongoTemplate.save(user);
     }
 
     public void deleteById(String id) {
         if (ObjectId.isValid(id)) {
             Query query = new Query(Criteria.where("_id").is(id));
-            mongoTemplate.remove(query, User.class);
+            mongoTemplate.remove(query, UserEnt.class);
         }
     }
 
-    public void update(User user) {
+    public void update(UserEnt user) {
         mongoTemplate.save(user);
     }
 
-    public List<User> findByUsernameContaining(String search) {
+    public List<UserEnt> findByUsernameContaining(String search) {
         Pattern regex = Pattern.compile(search, Pattern.CASE_INSENSITIVE);
         Query query = new Query(Criteria.where("username").regex(regex));
-        return mongoTemplate.find(query, User.class);
+        return mongoTemplate.find(query, UserEnt.class);
     }
 }

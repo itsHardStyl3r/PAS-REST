@@ -1,4 +1,4 @@
-package pl.hardstyl3r.objects.resources;
+package pl.hardstyl3r.repoadapters.objects.resources;
 
 public class NewspaperEnt extends ResourceEnt {
     private String releaseDate;

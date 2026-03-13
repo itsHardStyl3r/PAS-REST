@@ -13,10 +13,10 @@ import pl.hardstyl3r.pas.v1.dto.UserConverter;
 import pl.hardstyl3r.pas.v1.dto.UserDTO;
 import pl.hardstyl3r.pas.v1.exceptions.UserNotFoundException;
 import pl.hardstyl3r.pas.v1.exceptions.UserValidationException;
-import pl.hardstyl3r.pas.v1.objects.User;
-import pl.hardstyl3r.pas.v1.objects.UserRole;
 import pl.hardstyl3r.pas.v1.security.JwtUtil;
 import pl.hardstyl3r.pas.v1.services.UserService;
+import pl.hardstyl3r.repoadapters.objects.UserEnt;
+import pl.hardstyl3r.repoadapters.objects.UserEntRole;
 
 import java.util.List;
 
@@ -36,7 +36,7 @@ public class UserController {
 
     @GetMapping("/user/id/{id}")
     public ResponseEntity<UserDTO> getUserById(@PathVariable String id) {
-        User user = userService.findUserById(id)
+        UserEnt user = userService.findUserById(id)
                 .orElseThrow(() -> new UserNotFoundException("User with id " + id + " not found"));
 
         String etag = jwtUtil.generateValueSignature(user.getId());
@@ -98,7 +98,7 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.PRECONDITION_REQUIRED).build();
         }
 
-        User user = userService.findUserById(id)
+        UserEnt user = userService.findUserById(id)
                 .orElseThrow(() -> new UserNotFoundException("User not found"));
 
         if (!jwtUtil.verifyValueSignature(user.getId(), ifMatch)) {
@@ -114,7 +114,7 @@ public class UserController {
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> changeUserRole(@PathVariable String id, @RequestParam("role") String role) {
         try {
-            UserRole newRole = UserRole.valueOf(role.toUpperCase());
+            UserEntRole newRole = UserEntRole.valueOf(role.toUpperCase());
             userService.changeUserRole(id, newRole);
             return ResponseEntity.ok("User role updated successfully.");
         } catch (IllegalArgumentException e) {
@@ -125,7 +125,7 @@ public class UserController {
     @PatchMapping("/user/password")
     public ResponseEntity<?> changePassword(@RequestBody ChangePasswordRequest request) {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
-        User user = userService.findUserByUsername(username)
+        UserEnt user = userService.findUserByUsername(username)
                 .orElseThrow(() -> new UserNotFoundException("User not found"));
         userService.changePassword(user.getId(), request.oldPassword(), request.newPassword());
         return ResponseEntity.ok("Hasło zostało zmienione.");

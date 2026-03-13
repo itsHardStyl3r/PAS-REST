@@ -6,9 +6,9 @@ import pl.hardstyl3r.pas.v1.dto.EditResourceDTO;
 import pl.hardstyl3r.pas.v1.exceptions.ResourceInUseException;
 import pl.hardstyl3r.pas.v1.exceptions.ResourceNotFoundException;
 import pl.hardstyl3r.pas.v1.exceptions.ResourceValidationException;
-import pl.hardstyl3r.pas.v1.objects.resources.*;
 import pl.hardstyl3r.pas.v1.repositories.AllocationRepository;
 import pl.hardstyl3r.pas.v1.repositories.ResourceRepository;
+import pl.hardstyl3r.repoadapters.objects.resources.*;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
@@ -25,11 +25,11 @@ public class ResourceService {
         this.allocationRepository = allocationRepository;
     }
 
-    public List<Resource> findAll() {
+    public List<ResourceEnt> findAll() {
         return resourceRepository.findAll();
     }
 
-    public Optional<Resource> findById(String id) {
+    public Optional<ResourceEnt> findById(String id) {
         return resourceRepository.findById(id);
     }
 
@@ -53,7 +53,7 @@ public class ResourceService {
         }
     }
 
-    public Resource createResource(CreateResourceDTO dto) {
+    public ResourceEnt createResource(CreateResourceDTO dto) {
         if (dto.name() == null || dto.name().isBlank()) {
             throw new ResourceValidationException("Resource name cannot be blank.");
         }
@@ -67,7 +67,7 @@ public class ResourceService {
             throw new ResourceValidationException("Resource description must be between 3 and 200 characters.");
         }
 
-        Resource resource;
+        ResourceEnt resource;
         switch (dto.type().toLowerCase()) {
             case "book":
                 if (dto.author() == null || dto.author().isBlank()) {
@@ -82,7 +82,7 @@ public class ResourceService {
                 if (!isValidIsbn(dto.isbn())) {
                     throw new ResourceValidationException("Invalid ISBN format.");
                 }
-                resource = new Book(dto.name(), dto.description(), dto.author(), dto.isbn());
+                resource = new BookEnt(dto.name(), dto.description(), dto.author(), dto.isbn());
                 break;
             case "periodical":
                 if (dto.issueNumber() == null) {
@@ -91,7 +91,7 @@ public class ResourceService {
                 if (dto.issueNumber() <= 0) {
                     throw new ResourceValidationException("Issue number must be a positive number.");
                 }
-                resource = new Periodical(dto.name(), dto.description(), dto.issueNumber());
+                resource = new PeriodicalEnt(dto.name(), dto.description(), dto.issueNumber());
                 break;
             case "newspaper":
                 if (dto.releaseDate() == null) {
@@ -100,7 +100,7 @@ public class ResourceService {
                 if (!isValidDate(dto.releaseDate())) {
                     throw new ResourceValidationException("Invalid date format for releaseDate. Expected format is YYYY-MM-DD.");
                 }
-                resource = new Newspaper(dto.name(), dto.description(), dto.releaseDate());
+                resource = new NewspaperEnt(dto.name(), dto.description(), dto.releaseDate());
                 break;
             default:
                 throw new ResourceValidationException("Invalid resource type: " + dto.type());
@@ -118,8 +118,8 @@ public class ResourceService {
         resourceRepository.deleteById(id);
     }
 
-    public Resource updateResource(String id, EditResourceDTO dto) {
-        Resource resource = findById(id)
+    public ResourceEnt updateResource(String id, EditResourceDTO dto) {
+        ResourceEnt resource = findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Resource with id " + id + " not found."));
 
         if (dto.name() == null || dto.name().isBlank()) {
@@ -137,7 +137,7 @@ public class ResourceService {
         resource.setName(dto.name());
         resource.setDescription(dto.description());
 
-        if (resource instanceof Book book) {
+        if (resource instanceof BookEnt book) {
             if (dto.author() == null || dto.author().isBlank()) {
                 throw new ResourceValidationException("Author is required for a book.");
             }
@@ -152,7 +152,7 @@ public class ResourceService {
             }
             book.setAuthor(dto.author());
             book.setIsbn(dto.isbn());
-        } else if (resource instanceof Periodical periodical) {
+        } else if (resource instanceof PeriodicalEnt periodical) {
             if (dto.issueNumber() == null) {
                 throw new ResourceValidationException("Issue number is required for a periodical.");
             }
@@ -160,7 +160,7 @@ public class ResourceService {
                 throw new ResourceValidationException("Issue number must be a positive number.");
             }
             periodical.setIssueNumber(dto.issueNumber());
-        } else if (resource instanceof Newspaper newspaper) {
+        } else if (resource instanceof NewspaperEnt newspaper) {
             if (dto.releaseDate() == null) {
                 throw new ResourceValidationException("Release date is required for a newspaper.");
             }

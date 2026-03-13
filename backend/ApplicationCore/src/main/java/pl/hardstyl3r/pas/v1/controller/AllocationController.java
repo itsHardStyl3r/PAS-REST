@@ -10,10 +10,10 @@ import pl.hardstyl3r.pas.v1.dto.AllocationRequest;
 import pl.hardstyl3r.pas.v1.exceptions.ResourceNotFoundException;
 import pl.hardstyl3r.pas.v1.exceptions.UserNotFoundException;
 import pl.hardstyl3r.pas.v1.exceptions.UserValidationException;
-import pl.hardstyl3r.pas.v1.objects.Allocation;
-import pl.hardstyl3r.pas.v1.objects.User;
 import pl.hardstyl3r.pas.v1.services.AllocationService;
 import pl.hardstyl3r.pas.v1.services.UserService;
+import pl.hardstyl3r.repoadapters.objects.AllocationEnt;
+import pl.hardstyl3r.repoadapters.objects.UserEnt;
 
 import java.util.List;
 import java.util.Map;
@@ -32,20 +32,20 @@ public class AllocationController {
     }
 
     @GetMapping
-    public List<Allocation> getAllAllocations() {
+    public List<AllocationEnt> getAllAllocations() {
         return allocationService.findAll();
     }
 
     @GetMapping("/{id}")
     @PreAuthorize("hasAnyRole('ADMIN', 'RESOURCE_MANAGER')")
-    public Allocation getAllocationById(@PathVariable String id) {
+    public AllocationEnt getAllocationById(@PathVariable String id) {
         return allocationService.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Allocation with id " + id + " not found."));
     }
 
     @PostMapping
     @PreAuthorize("hasAnyRole('ADMIN', 'RESOURCE_MANAGER', 'CLIENT')")
-    public ResponseEntity<Allocation> createAllocation(@Valid @RequestBody AllocationRequest allocationRequest) {
+    public ResponseEntity<AllocationEnt> createAllocation(@Valid @RequestBody AllocationRequest allocationRequest) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         String currentUsername = auth.getName();
 
@@ -55,7 +55,7 @@ public class AllocationController {
         String targetUserId;
 
         if (isClient) {
-            User currentUser = userService.findUserByUsername(currentUsername)
+            UserEnt currentUser = userService.findUserByUsername(currentUsername)
                     .orElseThrow(() -> new UserNotFoundException("Nie znaleziono zalogowanego użytkownika."));
             targetUserId = currentUser.getId();
         } else {
@@ -70,14 +70,14 @@ public class AllocationController {
             targetUserId = allocationRequest.userId();
         }
 
-        Allocation createdAllocation = allocationService.createAllocation(targetUserId, allocationRequest.resourceId());
+        AllocationEnt createdAllocation = allocationService.createAllocation(targetUserId, allocationRequest.resourceId());
         return ResponseEntity.ok(createdAllocation);
     }
 
     @PostMapping("/{id}/end")
     @PreAuthorize("hasAnyRole('ADMIN', 'RESOURCE_MANAGER')")
-    public ResponseEntity<Allocation> endAllocation(@PathVariable String id) {
-        Allocation endedAllocation = allocationService.endAllocation(id);
+    public ResponseEntity<AllocationEnt> endAllocation(@PathVariable String id) {
+        AllocationEnt endedAllocation = allocationService.endAllocation(id);
         return ResponseEntity.ok(endedAllocation);
     }
 
@@ -90,14 +90,14 @@ public class AllocationController {
 
     @GetMapping("/user/{userId}/current")
     @PreAuthorize("hasAnyRole('ADMIN', 'RESOURCE_MANAGER', 'CLIENT')")
-    public List<Allocation> getCurrentAllocationsForUser(@PathVariable String userId) {
+    public List<AllocationEnt> getCurrentAllocationsForUser(@PathVariable String userId) {
         validateAccessToUserData(userId);
         return allocationService.getCurrentAllocationsForUser(userId);
     }
 
     @GetMapping("/user/{userId}/past")
     @PreAuthorize("hasAnyRole('ADMIN', 'RESOURCE_MANAGER', 'CLIENT')")
-    public List<Allocation> getPastAllocationsForUser(@PathVariable String userId) {
+    public List<AllocationEnt> getPastAllocationsForUser(@PathVariable String userId) {
         validateAccessToUserData(userId);
         return allocationService.getPastAllocationsForUser(userId);
     }
@@ -110,7 +110,7 @@ public class AllocationController {
 
         if (isClient) {
             String currentUsername = auth.getName();
-            User currentUser = userService.findUserByUsername(currentUsername)
+            UserEnt currentUser = userService.findUserByUsername(currentUsername)
                     .orElseThrow(() -> new UserNotFoundException("Nie znaleziono zalogowanego użytkownika."));
 
             if (!currentUser.getId().equals(requestedUserId)) {
