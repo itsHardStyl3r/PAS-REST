@@ -9,7 +9,7 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>pl.hardstyl3r</groupId>
-    <artifactId>pas</artifactId>
+    <artifactId>ApplicationCore</artifactId>
     <version>0.0.9-SNAPSHOT</version>
     <name>SpringRest</name>
     <description>REST application</description>
