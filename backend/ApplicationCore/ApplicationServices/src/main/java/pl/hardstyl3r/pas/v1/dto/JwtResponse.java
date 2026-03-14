@@ -1,4 +1,4 @@
-package pl.hardstyl3r.pas.v1.dto;
+package pl.hardstyl3r.pas.v1.services.dto;
 
 public class JwtResponse {
     private String token;
