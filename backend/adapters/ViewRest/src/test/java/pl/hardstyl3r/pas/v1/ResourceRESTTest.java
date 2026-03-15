@@ -78,9 +78,9 @@ class ResourceRESTTest {
         adminToken = loginAndGetToken("admin", "password");
         clientToken = loginAndGetToken("client", "password");
 
-        Document book1 = new Document("_class", Book.class.getName()).append("name", "Morderstwo w Orient Expressie").append("description", "Herkules Poirot...").append("author", "Agatha Christie").append("isbn", "9788327159779");
-        Document periodical = new Document("_class", Periodical.class.getName()).append("name", "CD-Action").append("description", "Magazyn...").append("issueNumber", 320);
-        Document newspaper = new Document("_class", Newspaper.class.getName()).append("name", "Gazeta Wyborcza").append("description", "Gazeta").append("releaseDate", "2025-11-17");
+        Document book1 = new Document("_class", "pl.hardstyl3r.repoadapters.objects.resources.BookEnt").append("name", "Morderstwo w Orient Expressie").append("description", "Herkules Poirot...").append("author", "Agatha Christie").append("isbn", "9788327159779");
+        Document periodical = new Document("_class", "pl.hardstyl3r.repoadapters.objects.resources.PeriodicalEnt").append("name", "CD-Action").append("description", "Magazyn...").append("issueNumber", 320);
+        Document newspaper = new Document("_class", "pl.hardstyl3r.repoadapters.objects.resources.NewspaperEnt").append("name", "Gazeta Wyborcza").append("description", "Gazeta").append("releaseDate", "2025-11-17");
         resourcesCollection.insertMany(Arrays.asList(book1, periodical, newspaper));
 
         this.bookId = Objects.requireNonNull(resourcesCollection.find(Filters.eq("name", "Morderstwo w Orient Expressie")).first()).getObjectId("_id").toHexString();

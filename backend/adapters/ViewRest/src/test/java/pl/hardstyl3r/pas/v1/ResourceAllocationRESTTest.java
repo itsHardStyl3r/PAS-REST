@@ -73,8 +73,8 @@ class ResourceAllocationRESTTest {
         userId = user.getObjectId("_id").toHexString();
         adminToken = loginAndGetToken("adminUser", "password");
 
-        Document allocatedResource = new Document("_class", Book.class.getName()).append("name", "Allocated Book");
-        Document unallocatedResource = new Document("_class", Book.class.getName()).append("name", "Unallocated Book");
+        Document allocatedResource = new Document("_class", "pl.hardstyl3r.repoadapters.objects.resources.BookEnt").append("name", "Allocated Book");
+        Document unallocatedResource = new Document("_class", "pl.hardstyl3r.repoadapters.objects.resources.BookEnt").append("name", "Unallocated Book");
         resources.insertMany(Arrays.asList(allocatedResource, unallocatedResource));
         allocatedResourceId = allocatedResource.getObjectId("_id").toHexString();
         unallocatedResourceId = unallocatedResource.getObjectId("_id").toHexString();
