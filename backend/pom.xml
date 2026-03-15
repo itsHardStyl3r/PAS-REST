@@ -42,27 +42,19 @@
     <dependencyManagement>
         <dependencies>
             <dependency>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-starter-web</artifactId>
+                <groupId>pl.hardstyl3r</groupId>
+                <artifactId>DomainModel</artifactId>
+                <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-starter-data-mongodb</artifactId>
+                <groupId>pl.hardstyl3r</groupId>
+                <artifactId>ApplicationPorts</artifactId>
+                <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-starter-test</artifactId>
-                <scope>test</scope>
-            </dependency>
-            <dependency>
-                <groupId>io.rest-assured</groupId>
-                <artifactId>rest-assured</artifactId>
-                <version>5.5.6</version>
-                <scope>test</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-starter-security</artifactId>
+                <groupId>pl.hardstyl3r</groupId>
+                <artifactId>ApplicationServices</artifactId>
+                <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>io.jsonwebtoken</groupId>
@@ -81,17 +73,8 @@
                 <version>0.13.0</version>
                 <scope>runtime</scope>
             </dependency>
-            <dependency>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-starter-validation</artifactId>
-            </dependency>
-            <dependency>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-starter-graphql</artifactId>
-            </dependency>
         </dependencies>
     </dependencyManagement>
-
     <build>
         <pluginManagement>
             <plugins>
@@ -102,5 +85,4 @@
             </plugins>
         </pluginManagement>
     </build>
-
 </project>
