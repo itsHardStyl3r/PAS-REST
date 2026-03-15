@@ -5,12 +5,3 @@ public class UserValidationException extends RuntimeException {
         super(message);
     }
 }
-
-//@RestControllerAdvice
-//class UserValidationAdvice {
-//    @ExceptionHandler(UserValidationException.class)
-//    @ResponseStatus(HttpStatus.BAD_REQUEST)
-//    String userValidationHandler(UserValidationException ex) {
-//        return ex.getMessage();
-//    }
-//}

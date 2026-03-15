@@ -5,12 +5,3 @@ public class ResourceInUseException extends RuntimeException {
         super(message);
     }
 }
-
-//@RestControllerAdvice
-//class ResourceInUseAdvice {
-//    @ExceptionHandler(ResourceInUseException.class)
-//    @ResponseStatus(HttpStatus.CONFLICT)
-//    String resourceInUseHandler(ResourceInUseException ex) {
-//        return ex.getMessage();
-//    }
-//}

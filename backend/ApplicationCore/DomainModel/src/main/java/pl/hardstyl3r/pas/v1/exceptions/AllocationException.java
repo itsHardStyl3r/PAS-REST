@@ -5,12 +5,3 @@ public class AllocationException extends RuntimeException {
         super(message);
     }
 }
-
-//@RestControllerAdvice
-//class AllocationAdvice {
-//    @ExceptionHandler(AllocationException.class)
-//    @ResponseStatus(HttpStatus.CONFLICT)
-//    String allocationHandler(AllocationException ex) {
-//        return ex.getMessage();
-//    }
-//}
