@@ -20,6 +20,11 @@
             <groupId>pl.hardstyl3r</groupId>
             <artifactId>DomainModel</artifactId>
         </dependency>
+        <dependency>
+            <groupId>pl.hardstyl3r</groupId>
+            <artifactId>RepositoriesAdapters</artifactId>
+            <version>${project.version}</version>
+        </dependency>
 
         <dependency>
             <groupId>org.springframework.boot</groupId>

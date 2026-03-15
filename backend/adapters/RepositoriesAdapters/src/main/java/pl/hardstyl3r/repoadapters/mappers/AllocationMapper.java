@@ -7,10 +7,11 @@ public class AllocationMapper {
 
     public static Allocation toDomain(AllocationEnt ent) {
         if (ent == null) return null;
-        return new Allocation(
-                ent.getUserId(),
-                ent.getResourceId()
-        );
+        Allocation domain = new Allocation(ent.getUserId(), ent.getResourceId());
+        domain.setId(ent.getId());
+        domain.setStartTime(ent.getStartTime());
+        domain.setEndTime(ent.getEndTime());
+        return domain;
     }
 
     public static AllocationEnt toEntity(Allocation domain) {
