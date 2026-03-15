@@ -193,16 +193,29 @@ class UserRESTTest {
 
     @Test
     void shouldUpdateUser() {
+        Response getResponse = given()
+                .header("Authorization", "Bearer " + adminToken)
+                .pathParam("id", aniaId)
+                .when()
+                .get("/api/v1/user/id/{id}")
+                .then()
+                .statusCode(200)
+                .extract().response();
+
+        String currentEtag = getResponse.getHeader("ETag");
+        assertThat(currentEtag).isNotNull();
+
         EditUserDTO newName = new EditUserDTO("Anna Maria");
         given()
                 .header("Authorization", "Bearer " + adminToken)
+                .header("If-Match", currentEtag)
                 .contentType(ContentType.JSON)
                 .body(newName)
                 .pathParam("id", aniaId)
                 .when()
                 .patch("/api/v1/user/id/{id}/rename")
                 .then()
-                .statusCode(200);
+                .statusCode(204);
 
         UserDTO user = given()
                 .header("Authorization", "Bearer " + adminToken)

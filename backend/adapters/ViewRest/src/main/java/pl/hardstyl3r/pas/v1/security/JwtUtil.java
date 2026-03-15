@@ -76,11 +76,17 @@ public class JwtUtil {
     }
 
     public boolean verifyValueSignature(String value, String jws) {
+        if (jws == null || jws.isBlank()) {
+            return false;
+        }
+
+        String cleanJws = jws.replace("\"", "");
+
         try {
             String extractedValue = Jwts.parser()
                     .verifyWith(getSigningKey())
                     .build()
-                    .parseSignedClaims(jws)
+                    .parseSignedClaims(cleanJws)
                     .getPayload()
                     .getSubject();
             return value.equals(extractedValue);
