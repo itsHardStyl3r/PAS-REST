@@ -5,23 +5,23 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-import pl.hardstyl3r.pas.v1.repositories.UserRepository;
-import pl.hardstyl3r.repoadapters.objects.UserEnt;
+import pl.hardstyl3r.pas.appports.UserPort;
+import pl.hardstyl3r.pas.v1.objects.User;
 
 import java.util.Collections;
 
 @Service
 public class UserDetailsServiceImpl implements UserDetailsService {
 
-    private final UserRepository userRepository;
+    private final UserPort userPort;
 
-    public UserDetailsServiceImpl(UserRepository userRepository) {
-        this.userRepository = userRepository;
+    public UserDetailsServiceImpl(UserPort userPort) {
+        this.userPort = userPort;
     }
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        UserEnt user = userRepository.findByUsername(username)
+        User user = userPort.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User Not Found with username: " + username));
 
         return new org.springframework.security.core.userdetails.User(

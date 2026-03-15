@@ -1,4 +1,4 @@
-package pl.hardstyl3r.pas.v1.db;
+package pl.hardstyl3r.repoadapters.db;
 
 import com.mongodb.MongoCommandException;
 import com.mongodb.client.MongoCollection;
@@ -22,9 +22,9 @@ import pl.hardstyl3r.repoadapters.objects.resources.BookEnt;
 import pl.hardstyl3r.repoadapters.objects.resources.NewspaperEnt;
 import pl.hardstyl3r.repoadapters.objects.resources.PeriodicalEnt;
 import pl.hardstyl3r.repoadapters.objects.resources.ResourceEnt;
-import pl.hardstyl3r.pas.v1.repositories.AllocationRepository;
-import pl.hardstyl3r.pas.v1.repositories.ResourceRepository;
-import pl.hardstyl3r.pas.v1.repositories.UserRepository;
+import pl.hardstyl3r.repoadapters.repositories.AllocationRepository;
+import pl.hardstyl3r.repoadapters.repositories.ResourceRepository;
+import pl.hardstyl3r.repoadapters.repositories.UserRepository;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
@@ -74,7 +74,9 @@ public class MongoInit implements CommandLineRunner {
     }
 
     private void createCollectionWithSchemaValidation(String collectionName, Document validator) {
-        mongoTemplate.dropCollection(collectionName);
+        if (mongoTemplate.collectionExists(collectionName)) {
+            mongoTemplate.dropCollection(collectionName);
+        }
         ValidationOptions validationOptions = new ValidationOptions().validator(validator);
         try {
             mongoDatabase.createCollection(collectionName, new CreateCollectionOptions().validationOptions(validationOptions));

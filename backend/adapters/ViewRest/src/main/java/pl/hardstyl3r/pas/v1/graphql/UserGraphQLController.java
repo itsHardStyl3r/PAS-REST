@@ -5,9 +5,9 @@ import org.springframework.graphql.data.method.annotation.QueryMapping;
 import org.springframework.stereotype.Controller;
 import pl.hardstyl3r.pas.v1.dto.UserDTO;
 import pl.hardstyl3r.pas.v1.dto.UserConverter;
+import pl.hardstyl3r.pas.v1.objects.User;
+import pl.hardstyl3r.pas.v1.objects.UserRole;
 import pl.hardstyl3r.pas.v1.services.UserService;
-import pl.hardstyl3r.repoadapters.objects.UserEnt;
-import pl.hardstyl3r.repoadapters.objects.UserEntRole;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -23,14 +23,14 @@ public class UserGraphQLController {
 
     @QueryMapping
     public List<UserDTO> users(@Argument UserFilter filter) {
-        List<UserEnt> allUsers = userService.findAll();
+        List<User> allUsers = userService.findAll();
         return allUsers.stream()
                 .filter(user -> filter == null || matchesFilter(user, filter))
                 .map(UserConverter::dtoFromUser)
                 .collect(Collectors.toList());
     }
 
-    private boolean matchesFilter(UserEnt user, UserFilter filter) {
+    private boolean matchesFilter(User user, UserFilter filter) {
         if (filter.username() != null && !user.getUsername().contains(filter.username())) return false;
         if (filter.name() != null && !user.getName().contains(filter.name())) return false;
         if (filter.active() != null && user.isActive() != filter.active()) return false;
@@ -38,5 +38,5 @@ public class UserGraphQLController {
         return true;
     }
 
-    public record UserFilter(String username, String name, Boolean active, UserEntRole role) {}
+    public record UserFilter(String username, String name, Boolean active, UserRole role) {}
 }
