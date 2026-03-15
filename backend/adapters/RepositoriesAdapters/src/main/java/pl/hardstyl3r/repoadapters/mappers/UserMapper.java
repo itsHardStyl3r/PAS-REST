@@ -16,7 +16,9 @@ public class UserMapper {
                 ent.isActive()
         );
         user.setId(ent.getId());
-        user.setRole(UserRole.valueOf(ent.getRole().name()));
+        if (ent.getRole() != null) {
+            user.setRole(UserRole.valueOf(ent.getRole().name()));
+        }
         return user;
     }
 
@@ -29,7 +31,9 @@ public class UserMapper {
                 domain.isActive()
         );
         ent.setId(domain.getId());
-        ent.setRole(UserEntRole.valueOf(domain.getRole().name()));
+        if (domain.getRole() != null) {
+            ent.setRole(UserEntRole.valueOf(domain.getRole().name()));
+        }
         return ent;
     }
 }
