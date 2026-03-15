@@ -1,4 +1,4 @@
-package pl.hardstyl3r.pas.v1.db;
+package pl.hardstyl3r.repoadapters.db;
 
 import com.mongodb.client.MongoDatabase;
 import org.bson.Document;

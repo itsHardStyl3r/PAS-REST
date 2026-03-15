@@ -16,7 +16,7 @@ import pl.hardstyl3r.pas.v1.exceptions.UsernameIsTakenException;
 import pl.hardstyl3r.pas.v1.security.UserDetailsServiceImpl;
 import pl.hardstyl3r.pas.v1.services.UserService;
 import pl.hardstyl3r.pas.v1.security.JwtUtil;
-import pl.hardstyl3r.repoadapters.objects.UserEnt;
+import pl.hardstyl3r.pas.v1.objects.User;
 
 import java.util.Map;
 
@@ -49,7 +49,7 @@ public class AuthController {
         String jwt = jwtUtil.generateToken(userDetails);
         String refreshToken = jwtUtil.generateRefreshToken(userDetails);
 
-        UserEnt user = userService.findUserByUsername(userDetails.getUsername())
+        User user = userService.findUserByUsername(userDetails.getUsername())
                 .orElseThrow(() -> new RuntimeException("Error: User is not found."));
 
         return ResponseEntity.ok(new JwtResponse(jwt, refreshToken, user.getId(), user.getUsername(), user.getRole().name()));
@@ -61,7 +61,7 @@ public class AuthController {
             throw new UsernameIsTakenException(registerRequest.username());
         }
 
-        UserEnt user = new UserEnt(registerRequest.username(), registerRequest.password(), registerRequest.name(), false);
+        User user = new User(registerRequest.username(), registerRequest.password(), registerRequest.name(), false);
         userService.registerUser(user);
         return ResponseEntity.ok("User registered successfully!");
     }
@@ -81,7 +81,7 @@ public class AuthController {
             if (jwtUtil.isTokenValid(refreshToken, userDetails)) {
                 String newAccessToken = jwtUtil.generateToken(userDetails);
 
-                UserEnt user = userService.findUserByUsername(userDetails.getUsername())
+                User user = userService.findUserByUsername(userDetails.getUsername())
                         .orElseThrow(() -> new UserNotFoundException("User not found"));
 
                 return ResponseEntity.ok(new JwtResponse(newAccessToken, refreshToken, user.getId(), user.getUsername(), user.getRole().name()));
