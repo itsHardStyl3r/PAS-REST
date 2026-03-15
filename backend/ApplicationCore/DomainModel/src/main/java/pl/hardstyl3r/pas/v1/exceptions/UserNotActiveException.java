@@ -6,13 +6,3 @@ public class UserNotActiveException extends RuntimeException {
         super(message);
     }
 }
-
-//@RestControllerAdvice
-//class UserNotActiveAdvice {
-//
-//    @ExceptionHandler(UserNotActiveException.class)
-//    @ResponseStatus(HttpStatus.CONFLICT)
-//    String userNotActiveHandler(UserNotActiveException ex) {
-//        return ex.getMessage();
-//    }
-//}

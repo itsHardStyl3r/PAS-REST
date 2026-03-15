@@ -5,12 +5,3 @@ public class InputValidationException extends RuntimeException {
         super(message);
     }
 }
-
-//@RestControllerAdvice
-//class InputValidationAdvice {
-//    @ExceptionHandler(InputValidationException.class)
-//    @ResponseStatus(HttpStatus.BAD_REQUEST)
-//    String inputValidationHandler(InputValidationException ex) {
-//        return ex.getMessage();
-//    }
-//}
