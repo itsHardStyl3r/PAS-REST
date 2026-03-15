@@ -104,6 +104,9 @@ public class ResourceService {
         } else if (resource instanceof Periodical periodical) {
             periodical.setIssueNumber(dto.issueNumber());
         } else if (resource instanceof Newspaper newspaper) {
+            if (!isValidDate(dto.releaseDate())) {
+                throw new ResourceValidationException("Invalid date format for releaseDate. Expected format is YYYY-MM-DD.");
+            }
             newspaper.setReleaseDate(dto.releaseDate());
         }
         return resourcePort.save(resource);

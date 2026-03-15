@@ -89,8 +89,8 @@ class AllocationRESTTest {
 
         adminToken = loginAndGetToken("admin", "password");
 
-        Document availableResource = new Document("_class", Book.class.getName()).append("name", "Available Book");
-        Document allocatedResource = new Document("_class", Book.class.getName()).append("name", "Allocated Book");
+        Document availableResource = new Document("_class", "pl.hardstyl3r.repoadapters.objects.resources.BookEnt").append("name", "Available Book");
+        Document allocatedResource = new Document("_class", "pl.hardstyl3r.repoadapters.objects.resources.BookEnt").append("name", "Allocated Book");
         resources.insertMany(Arrays.asList(availableResource, allocatedResource));
         availableResourceId = availableResource.getObjectId("_id").toHexString();
         allocatedResourceId = allocatedResource.getObjectId("_id").toHexString();
