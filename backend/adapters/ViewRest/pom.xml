@@ -5,16 +5,11 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>pl.hardstyl3r</groupId>
-        <artifactId>backend</artifactId>
+        <artifactId>adapters</artifactId>
         <version>0.1-SNAPSHOT</version>
     </parent>
 
-    <artifactId>adapters</artifactId>
-    <packaging>pom</packaging>
-    <modules>
-        <module>RepositoriesAdapters</module>
-        <module>ViewRest</module>
-    </modules>
+    <artifactId>ViewRest</artifactId>
 
     <properties>
         <maven.compiler.source>21</maven.compiler.source>
