@@ -1,7 +1,7 @@
 package pl.hardstyl3r.repoadapters.adapters;
 
 import org.springframework.stereotype.Component;
-import pl.hardstyl3r.appports.ResourcePort;
+import pl.hardstyl3r.pas.appports.ResourcePort;
 import pl.hardstyl3r.pas.v1.objects.resources.Resource;
 import pl.hardstyl3r.repoadapters.mappers.ResourceMapper;
 import pl.hardstyl3r.repoadapters.repositories.ResourceRepository;

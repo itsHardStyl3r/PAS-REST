@@ -2,7 +2,7 @@ package pl.hardstyl3r.pas.v1.services;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import pl.hardstyl3r.appports.UserPort;
+import pl.hardstyl3r.pas.appports.UserPort;
 import pl.hardstyl3r.pas.v1.exceptions.*;
 import pl.hardstyl3r.pas.v1.objects.User;
 import pl.hardstyl3r.pas.v1.objects.UserRole;

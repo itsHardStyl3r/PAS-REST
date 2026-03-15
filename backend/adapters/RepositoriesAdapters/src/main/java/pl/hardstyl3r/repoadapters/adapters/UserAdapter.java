@@ -1,7 +1,7 @@
 package pl.hardstyl3r.repoadapters.adapters;
 
 import org.springframework.stereotype.Component;
-import pl.hardstyl3r.appports.UserPort;
+import pl.hardstyl3r.pas.appports.UserPort;
 import pl.hardstyl3r.pas.v1.objects.User;
 import pl.hardstyl3r.repoadapters.mappers.UserMapper;
 import pl.hardstyl3r.repoadapters.repositories.UserRepository;

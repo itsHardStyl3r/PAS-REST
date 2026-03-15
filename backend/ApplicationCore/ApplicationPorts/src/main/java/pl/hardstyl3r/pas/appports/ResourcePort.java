@@ -1,4 +1,4 @@
-package pl.hardstyl3r.appports;
+package pl.hardstyl3r.pas.appports;
 
 import pl.hardstyl3r.pas.v1.objects.resources.Resource;
 

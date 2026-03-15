@@ -1,9 +1,9 @@
 package pl.hardstyl3r.pas.v1.services;
 
 import org.springframework.stereotype.Service;
-import pl.hardstyl3r.appports.AllocationPort;
-import pl.hardstyl3r.appports.ResourcePort;
-import pl.hardstyl3r.appports.UserPort;
+import pl.hardstyl3r.pas.appports.AllocationPort;
+import pl.hardstyl3r.pas.appports.ResourcePort;
+import pl.hardstyl3r.pas.appports.UserPort;
 import pl.hardstyl3r.pas.v1.exceptions.*;
 import pl.hardstyl3r.pas.v1.objects.Allocation;
 import pl.hardstyl3r.pas.v1.objects.User;

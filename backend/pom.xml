@@ -15,7 +15,6 @@
     <modules>
         <module>adapters</module>
         <module>ApplicationCore</module>
-        <module>ApplicationPorts</module>
     </modules>
     <url/>
     <licenses>

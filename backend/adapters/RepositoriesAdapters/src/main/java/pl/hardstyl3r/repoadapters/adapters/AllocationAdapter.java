@@ -1,7 +1,7 @@
 package pl.hardstyl3r.repoadapters.adapters;
 
 import org.springframework.stereotype.Component;
-import pl.hardstyl3r.appports.AllocationPort;
+import pl.hardstyl3r.pas.appports.AllocationPort;
 import pl.hardstyl3r.pas.v1.objects.Allocation;
 import pl.hardstyl3r.repoadapters.mappers.AllocationMapper;
 import pl.hardstyl3r.repoadapters.repositories.AllocationRepository;
