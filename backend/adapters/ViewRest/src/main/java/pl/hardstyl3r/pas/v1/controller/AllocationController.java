@@ -12,8 +12,8 @@ import pl.hardstyl3r.pas.v1.exceptions.UserNotFoundException;
 import pl.hardstyl3r.pas.v1.exceptions.UserValidationException;
 import pl.hardstyl3r.pas.v1.objects.Allocation;
 import pl.hardstyl3r.pas.v1.objects.User;
-import pl.hardstyl3r.pas.v1.services.AllocationService;
-import pl.hardstyl3r.pas.v1.services.UserService;
+import pl.hardstyl3r.pas.v1.viewports.AllocationViewPort;
+import pl.hardstyl3r.pas.v1.viewports.UserViewPort;
 
 import java.util.List;
 
@@ -22,23 +22,23 @@ import java.util.List;
 @CrossOrigin(origins = "http://localhost:5173")
 public class AllocationController {
 
-    private final AllocationService allocationService;
-    private final UserService userService;
+    private final AllocationViewPort allocationViewPort;
+    private final UserViewPort userViewPort;
 
-    public AllocationController(AllocationService allocationService, UserService userService) {
-        this.allocationService = allocationService;
-        this.userService = userService;
+    public AllocationController(AllocationViewPort allocationViewPort, UserViewPort userViewPort) {
+        this.allocationViewPort = allocationViewPort;
+        this.userViewPort = userViewPort;
     }
 
     @GetMapping
     public List<Allocation> getAllAllocations() {
-        return allocationService.findAll();
+        return allocationViewPort.findAll();
     }
 
     @GetMapping("/{id}")
     @PreAuthorize("hasAnyRole('ADMIN', 'RESOURCE_MANAGER')")
     public Allocation getAllocationById(@PathVariable String id) {
-        return allocationService.findById(id)
+        return allocationViewPort.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Allocation with id " + id + " not found."));
     }
 
@@ -54,7 +54,7 @@ public class AllocationController {
         String targetUserId;
 
         if (isClient) {
-            User currentUser = userService.findUserByUsername(currentUsername)
+            User currentUser = userViewPort.findUserByUsername(currentUsername)
                     .orElseThrow(() -> new UserNotFoundException("Nie znaleziono zalogowanego użytkownika."));
             targetUserId = currentUser.getId();
         } else {
@@ -64,21 +64,21 @@ public class AllocationController {
             targetUserId = allocationRequest.userId();
         }
 
-        Allocation createdAllocation = allocationService.createAllocation(targetUserId, allocationRequest.resourceId());
+        Allocation createdAllocation = allocationViewPort.createAllocation(targetUserId, allocationRequest.resourceId());
         return ResponseEntity.ok(createdAllocation);
     }
 
     @PostMapping("/{id}/end")
     @PreAuthorize("hasAnyRole('ADMIN', 'RESOURCE_MANAGER')")
     public ResponseEntity<Allocation> endAllocation(@PathVariable String id) {
-        Allocation endedAllocation = allocationService.endAllocation(id);
+        Allocation endedAllocation = allocationViewPort.endAllocation(id);
         return ResponseEntity.ok(endedAllocation);
     }
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasAnyRole('ADMIN', 'RESOURCE_MANAGER')")
     public ResponseEntity<Void> deleteAllocation(@PathVariable String id) {
-        allocationService.deleteById(id);
+        allocationViewPort.deleteById(id);
         return ResponseEntity.noContent().build();
     }
 
@@ -86,14 +86,14 @@ public class AllocationController {
     @PreAuthorize("hasAnyRole('ADMIN', 'RESOURCE_MANAGER', 'CLIENT')")
     public List<Allocation> getCurrentAllocationsForUser(@PathVariable String userId) {
         validateAccessToUserData(userId);
-        return allocationService.getCurrentAllocationsForUser(userId);
+        return allocationViewPort.getCurrentAllocationsForUser(userId);
     }
 
     @GetMapping("/user/{userId}/past")
     @PreAuthorize("hasAnyRole('ADMIN', 'RESOURCE_MANAGER', 'CLIENT')")
     public List<Allocation> getPastAllocationsForUser(@PathVariable String userId) {
         validateAccessToUserData(userId);
-        return allocationService.getPastAllocationsForUser(userId);
+        return allocationViewPort.getPastAllocationsForUser(userId);
     }
 
     private void validateAccessToUserData(String requestedUserId) {
@@ -104,7 +104,7 @@ public class AllocationController {
 
         if (isClient) {
             String currentUsername = auth.getName();
-            User currentUser = userService.findUserByUsername(currentUsername)
+            User currentUser = userViewPort.findUserByUsername(currentUsername)
                     .orElseThrow(() -> new UserNotFoundException("Nie znaleziono zalogowanego użytkownika."));
 
             if (!currentUser.getId().equals(requestedUserId)) {

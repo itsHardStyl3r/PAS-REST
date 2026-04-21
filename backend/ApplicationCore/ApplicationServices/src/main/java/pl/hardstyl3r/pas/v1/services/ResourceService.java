@@ -3,8 +3,6 @@ package pl.hardstyl3r.pas.v1.services;
 import org.springframework.stereotype.Service;
 import pl.hardstyl3r.pas.appports.AllocationPort;
 import pl.hardstyl3r.pas.appports.ResourcePort;
-import pl.hardstyl3r.pas.v1.dto.CreateResourceDTO;
-import pl.hardstyl3r.pas.v1.dto.EditResourceDTO;
 import pl.hardstyl3r.pas.v1.exceptions.ResourceInUseException;
 import pl.hardstyl3r.pas.v1.exceptions.ResourceNotFoundException;
 import pl.hardstyl3r.pas.v1.exceptions.ResourceValidationException;
@@ -12,6 +10,9 @@ import pl.hardstyl3r.pas.v1.objects.resources.Book;
 import pl.hardstyl3r.pas.v1.objects.resources.Newspaper;
 import pl.hardstyl3r.pas.v1.objects.resources.Periodical;
 import pl.hardstyl3r.pas.v1.objects.resources.Resource;
+import pl.hardstyl3r.pas.v1.viewports.CreateResourceCommand;
+import pl.hardstyl3r.pas.v1.viewports.EditResourceCommand;
+import pl.hardstyl3r.pas.v1.viewports.ResourceViewPort;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
@@ -19,7 +20,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-public class ResourceService {
+public class ResourceService implements ResourceViewPort {
     private final ResourcePort resourcePort;
     private final AllocationPort allocationPort;
 
@@ -28,10 +29,12 @@ public class ResourceService {
         this.allocationPort = allocationPort;
     }
 
+    @Override
     public List<Resource> findAll() {
         return resourcePort.findAll();
     }
 
+    @Override
     public Optional<Resource> findById(String id) {
         return resourcePort.findById(id);
     }
@@ -52,33 +55,35 @@ public class ResourceService {
         }
     }
 
-    public Resource createResource(CreateResourceDTO dto) {
-        validateDto(dto.name(), dto.description());
+    @Override
+    public Resource createResource(CreateResourceCommand command) {
+        validateDto(command.name(), command.description());
 
         Resource resource;
-        switch (dto.type().toLowerCase()) {
+        switch (command.type().toLowerCase()) {
             case "book":
-                validateBook(dto.author(), dto.isbn());
-                resource = new Book(null, dto.name(), dto.description(), dto.author(), dto.isbn());
+                validateBook(command.author(), command.isbn());
+                resource = new Book(null, command.name(), command.description(), command.author(), command.isbn());
                 break;
             case "periodical":
-                if (dto.issueNumber() == null || dto.issueNumber() <= 0) {
+                if (command.issueNumber() == null || command.issueNumber() <= 0) {
                     throw new ResourceValidationException("Valid issue number is required for a periodical.");
                 }
-                resource = new Periodical(null, dto.name(), dto.description(), dto.issueNumber());
+                resource = new Periodical(null, command.name(), command.description(), command.issueNumber());
                 break;
             case "newspaper":
-                if (dto.releaseDate() == null || !isValidDate(dto.releaseDate())) {
+                if (command.releaseDate() == null || !isValidDate(command.releaseDate())) {
                     throw new ResourceValidationException("Valid release date is required for a newspaper.");
                 }
-                resource = new Newspaper(null, dto.name(), dto.description(), dto.releaseDate());
+                resource = new Newspaper(null, command.name(), command.description(), command.releaseDate());
                 break;
             default:
-                throw new ResourceValidationException("Invalid resource type: " + dto.type());
+                throw new ResourceValidationException("Invalid resource type: " + command.type());
         }
         return resourcePort.save(resource);
     }
 
+    @Override
     public void deleteById(String id) {
         if (!resourcePort.existsById(id)) {
             throw new ResourceNotFoundException("Resource with id " + id + " not found.");
@@ -89,25 +94,26 @@ public class ResourceService {
         resourcePort.deleteById(id);
     }
 
-    public Resource updateResource(String id, EditResourceDTO dto) {
+    @Override
+    public Resource updateResource(String id, EditResourceCommand command) {
         Resource resource = findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Resource with id " + id + " not found."));
 
-        validateDto(dto.name(), dto.description());
-        resource.setName(dto.name());
-        resource.setDescription(dto.description());
+        validateDto(command.name(), command.description());
+        resource.setName(command.name());
+        resource.setDescription(command.description());
 
         if (resource instanceof Book book) {
-            validateBook(dto.author(), dto.isbn());
-            book.setAuthor(dto.author());
-            book.setIsbn(dto.isbn());
+            validateBook(command.author(), command.isbn());
+            book.setAuthor(command.author());
+            book.setIsbn(command.isbn());
         } else if (resource instanceof Periodical periodical) {
-            periodical.setIssueNumber(dto.issueNumber());
+            periodical.setIssueNumber(command.issueNumber());
         } else if (resource instanceof Newspaper newspaper) {
-            if (!isValidDate(dto.releaseDate())) {
+            if (!isValidDate(command.releaseDate())) {
                 throw new ResourceValidationException("Invalid date format for releaseDate. Expected format is YYYY-MM-DD.");
             }
-            newspaper.setReleaseDate(dto.releaseDate());
+            newspaper.setReleaseDate(command.releaseDate());
         }
         return resourcePort.save(resource);
     }

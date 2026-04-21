@@ -7,7 +7,9 @@ import pl.hardstyl3r.pas.v1.dto.CreateResourceDTO;
 import pl.hardstyl3r.pas.v1.dto.EditResourceDTO;
 import pl.hardstyl3r.pas.v1.exceptions.ResourceNotFoundException;
 import pl.hardstyl3r.pas.v1.objects.resources.Resource;
-import pl.hardstyl3r.pas.v1.services.ResourceService;
+import pl.hardstyl3r.pas.v1.viewports.CreateResourceCommand;
+import pl.hardstyl3r.pas.v1.viewports.EditResourceCommand;
+import pl.hardstyl3r.pas.v1.viewports.ResourceViewPort;
 
 import java.util.List;
 
@@ -16,41 +18,56 @@ import java.util.List;
 @CrossOrigin(origins = "http://localhost:5173")
 public class ResourceController {
 
-    private final ResourceService resourceService;
+    private final ResourceViewPort resourceViewPort;
 
-    public ResourceController(ResourceService resourceService) {
-        this.resourceService = resourceService;
+    public ResourceController(ResourceViewPort resourceViewPort) {
+        this.resourceViewPort = resourceViewPort;
     }
 
     @GetMapping
     public List<Resource> getAllResources() {
-        return resourceService.findAll();
+        return resourceViewPort.findAll();
     }
 
     @GetMapping("/{id}")
     public Resource getResourceById(@PathVariable String id) {
-        return resourceService.findById(id)
+        return resourceViewPort.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Resource with id " + id + " not found."));
     }
 
     @PostMapping
     @PreAuthorize("hasAnyRole('ADMIN', 'RESOURCE_MANAGER')")
     public ResponseEntity<Resource> createResource(@RequestBody CreateResourceDTO createResourceDTO) {
-        Resource createdResource = resourceService.createResource(createResourceDTO);
+        Resource createdResource = resourceViewPort.createResource(new CreateResourceCommand(
+                createResourceDTO.type(),
+                createResourceDTO.name(),
+                createResourceDTO.description(),
+                createResourceDTO.author(),
+                createResourceDTO.isbn(),
+                createResourceDTO.issueNumber(),
+                createResourceDTO.releaseDate()
+        ));
         return ResponseEntity.ok(createdResource);
     }
 
     @PutMapping("/{id}")
     @PreAuthorize("hasAnyRole('ADMIN', 'RESOURCE_MANAGER')")
     public ResponseEntity<Resource> editResource(@PathVariable String id, @RequestBody EditResourceDTO editResourceDTO) {
-        Resource editedResource = resourceService.updateResource(id, editResourceDTO);
+        Resource editedResource = resourceViewPort.updateResource(id, new EditResourceCommand(
+                editResourceDTO.name(),
+                editResourceDTO.description(),
+                editResourceDTO.author(),
+                editResourceDTO.isbn(),
+                editResourceDTO.issueNumber(),
+                editResourceDTO.releaseDate()
+        ));
         return ResponseEntity.ok(editedResource);
     }
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasAnyRole('ADMIN', 'RESOURCE_MANAGER')")
     public ResponseEntity<Void> deleteResource(@PathVariable String id) {
-        resourceService.deleteById(id);
+        resourceViewPort.deleteById(id);
         return ResponseEntity.noContent().build();
     }
 }

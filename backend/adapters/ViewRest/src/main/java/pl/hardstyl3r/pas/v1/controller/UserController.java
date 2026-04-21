@@ -16,7 +16,7 @@ import pl.hardstyl3r.pas.v1.exceptions.UserValidationException;
 import pl.hardstyl3r.pas.v1.objects.User;
 import pl.hardstyl3r.pas.v1.objects.UserRole;
 import pl.hardstyl3r.pas.v1.security.JwtUtil;
-import pl.hardstyl3r.pas.v1.services.UserService;
+import pl.hardstyl3r.pas.v1.viewports.UserViewPort;
 
 import java.util.List;
 
@@ -25,18 +25,18 @@ import java.util.List;
 @CrossOrigin(origins = "http://localhost:5173", exposedHeaders = "ETag")
 public class UserController {
 
-    private final UserService userService;
+    private final UserViewPort userViewPort;
     private final JwtUtil jwtUtil;
 
     @Autowired
-    public UserController(UserService userService, JwtUtil jwtUtil) {
-        this.userService = userService;
+    public UserController(UserViewPort userViewPort, JwtUtil jwtUtil) {
+        this.userViewPort = userViewPort;
         this.jwtUtil = jwtUtil;
     }
 
     @GetMapping("/user/id/{id}")
     public ResponseEntity<UserDTO> getUserById(@PathVariable String id) {
-        User user = userService.findUserById(id)
+        User user = userViewPort.findUserById(id)
                 .orElseThrow(() -> new UserNotFoundException("User with id " + id + " not found"));
 
         String etag = jwtUtil.generateValueSignature(user.getId());
@@ -48,43 +48,43 @@ public class UserController {
 
     @GetMapping("/user/username/{username}")
     public UserDTO getUserByName(@PathVariable String username) {
-        return userService.findUserByUsername(username)
+        return userViewPort.findUserByUsername(username)
                 .map(UserConverter::dtoFromUser)
                 .orElseThrow(() -> new UserNotFoundException("User with username " + username + " not found"));
     }
 
     @GetMapping("/users")
     public List<UserDTO> getUsers() {
-        return UserConverter.dtoFromUsers(userService.findAll());
+        return UserConverter.dtoFromUsers(userViewPort.findAll());
     }
 
     @DeleteMapping("/user/id/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public void deleteUser(@PathVariable String id) {
-        userService.deleteUserById(id);
+        userViewPort.deleteUserById(id);
     }
 
     @PatchMapping("/user/id/{id}/deactivate")
     @PreAuthorize("hasRole('ADMIN')")
     public void deactivateUser(@PathVariable String id) {
-        if (userService.findUserById(id).isEmpty()) {
+        if (userViewPort.findUserById(id).isEmpty()) {
             throw new UserNotFoundException("User with id " + id + " not found");
         }
-        userService.userActivationById(id, false);
+        userViewPort.userActivationById(id, false);
     }
 
     @PatchMapping("/user/id/{id}/activate")
     @PreAuthorize("hasRole('ADMIN')")
     public void activateUser(@PathVariable String id) {
-        if (userService.findUserById(id).isEmpty()) {
+        if (userViewPort.findUserById(id).isEmpty()) {
             throw new UserNotFoundException("User with id " + id + " not found");
         }
-        userService.userActivationById(id, true);
+        userViewPort.userActivationById(id, true);
     }
 
     @GetMapping("/user/search/{search}")
     public List<UserDTO> searchForUser(@PathVariable String search) {
-        return UserConverter.dtoFromUsers(userService.searchForUsersByUsername(search));
+        return UserConverter.dtoFromUsers(userViewPort.searchForUsersByUsername(search));
     }
 
     @PatchMapping("/user/id/{id}/rename")
@@ -98,14 +98,14 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.PRECONDITION_REQUIRED).build();
         }
 
-        User user = userService.findUserById(id)
+        User user = userViewPort.findUserById(id)
                 .orElseThrow(() -> new UserNotFoundException("User not found"));
 
         if (!jwtUtil.verifyValueSignature(user.getId(), ifMatch)) {
             return ResponseEntity.status(HttpStatus.PRECONDITION_FAILED).build();
         }
 
-        userService.renameUserById(id, userDTO.name());
+        userViewPort.renameUserById(id, userDTO.name());
 
         return ResponseEntity.noContent().build();
     }
@@ -115,7 +115,7 @@ public class UserController {
     public ResponseEntity<?> changeUserRole(@PathVariable String id, @RequestParam("role") String role) {
         try {
             UserRole newRole = UserRole.valueOf(role.toUpperCase());
-            userService.changeUserRole(id, newRole);
+            userViewPort.changeUserRole(id, newRole);
             return ResponseEntity.ok("User role updated successfully.");
         } catch (IllegalArgumentException e) {
             throw new UserValidationException("Invalid role: " + role);
@@ -125,9 +125,9 @@ public class UserController {
     @PatchMapping("/user/password")
     public ResponseEntity<?> changePassword(@RequestBody ChangePasswordRequest request) {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
-        User user = userService.findUserByUsername(username)
+        User user = userViewPort.findUserByUsername(username)
                 .orElseThrow(() -> new UserNotFoundException("User not found"));
-        userService.changePassword(user.getId(), request.oldPassword(), request.newPassword());
+        userViewPort.changePassword(user.getId(), request.oldPassword(), request.newPassword());
         return ResponseEntity.ok("Hasło zostało zmienione.");
     }
 }

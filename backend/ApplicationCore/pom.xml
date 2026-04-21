@@ -16,5 +16,6 @@
         <module>DomainModel</module>
         <module>ApplicationServices</module>
         <module>ApplicationPorts</module>
+        <module>ViewPorts</module>
     </modules>
 </project>

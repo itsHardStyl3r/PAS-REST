@@ -7,6 +7,7 @@ import pl.hardstyl3r.pas.appports.UserPort;
 import pl.hardstyl3r.pas.v1.exceptions.*;
 import pl.hardstyl3r.pas.v1.objects.Allocation;
 import pl.hardstyl3r.pas.v1.objects.User;
+import pl.hardstyl3r.pas.v1.viewports.AllocationViewPort;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -14,7 +15,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
-public class AllocationService {
+public class AllocationService implements AllocationViewPort {
 
     private final AllocationPort allocationPort;
     private final UserPort userPort;
@@ -26,14 +27,17 @@ public class AllocationService {
         this.resourcePort = resourcePort;
     }
 
+    @Override
     public List<Allocation> findAll() {
         return allocationPort.findAll();
     }
 
+    @Override
     public Optional<Allocation> findById(String id) {
         return allocationPort.findById(id);
     }
 
+    @Override
     public Allocation createAllocation(String userId, String resourceId) {
         User user = userPort.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException("User with id " + userId + " not found."));
@@ -53,6 +57,7 @@ public class AllocationService {
         return allocationPort.save(allocation);
     }
 
+    @Override
     public Allocation endAllocation(String id) {
         Allocation allocation = allocationPort.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Allocation with id " + id + " not found."));
@@ -65,6 +70,7 @@ public class AllocationService {
         return allocationPort.save(allocation);
     }
 
+    @Override
     public void deleteById(String id) {
         Allocation allocation = allocationPort.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Allocation with id " + id + " not found."));
@@ -75,12 +81,14 @@ public class AllocationService {
         allocationPort.deleteById(id);
     }
 
+    @Override
     public List<Allocation> getCurrentAllocationsForUser(String userId) {
         return allocationPort.findByUserId(userId).stream()
                 .filter(a -> a.getEndTime() == null)
                 .collect(Collectors.toList());
     }
 
+    @Override
     public List<Allocation> getPastAllocationsForUser(String userId) {
         return allocationPort.findByUserId(userId).stream()
                 .filter(a -> a.getEndTime() != null)
