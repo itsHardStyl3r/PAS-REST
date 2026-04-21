@@ -32,7 +32,7 @@ import static org.hamcrest.Matchers.hasSize;
 @ActiveProfiles("test")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class ResourceRESTTest {
+class ResourceRESTTest extends BaseMongoIntegrationTest {
 
     @Autowired
     private MongoTemplate mongoTemplate;

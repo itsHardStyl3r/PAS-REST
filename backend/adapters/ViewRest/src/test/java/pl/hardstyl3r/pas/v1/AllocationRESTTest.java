@@ -29,12 +29,11 @@ import java.util.stream.Stream;
 
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.*;
-import static org.hamcrest.Matchers.hasSize;
 
 @ActiveProfiles("test")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class AllocationRESTTest {
+class AllocationRESTTest extends BaseMongoIntegrationTest {
 
     @Autowired
     private MongoTemplate mongoTemplate;

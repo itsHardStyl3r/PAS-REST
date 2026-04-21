@@ -25,7 +25,7 @@ import static io.restassured.RestAssured.given;
 @ActiveProfiles("test")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class ResourceAllocationRESTTest {
+class ResourceAllocationRESTTest extends BaseMongoIntegrationTest {
 
     @Autowired
     private MongoTemplate mongoTemplate;

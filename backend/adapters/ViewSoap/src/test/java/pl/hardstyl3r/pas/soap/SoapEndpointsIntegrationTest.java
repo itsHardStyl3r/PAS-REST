@@ -28,7 +28,7 @@ import static org.springframework.ws.test.server.ResponseMatchers.noFault;
 import static org.springframework.ws.test.server.ResponseMatchers.xpath;
 
 @SpringBootTest(classes = SpringSoapApplication.class)
-class SoapEndpointsIntegrationTest {
+class SoapEndpointsIntegrationTest extends BaseMongoIntegrationTest {
 
     private static final String NS = "http://p.lodz.pl/pas/soap";
 

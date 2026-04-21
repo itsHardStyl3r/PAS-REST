@@ -10,14 +10,11 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class MongoConfig {
 
-    @Value("${spring.data.mongodb.uri}")
-    private String connectionString;
-
-    @Value("${spring.data.mongodb.database}")
-    private String databaseName;
-
     @Bean
-    public MongoDatabase mongoDatabase() {
+    public MongoDatabase mongoDatabase(
+            @Value("${spring.data.mongodb.uri}") String connectionString,
+            @Value("${spring.data.mongodb.database}") String databaseName) {
+
         MongoClient mongoClient = MongoClients.create(connectionString);
         return mongoClient.getDatabase(databaseName);
     }

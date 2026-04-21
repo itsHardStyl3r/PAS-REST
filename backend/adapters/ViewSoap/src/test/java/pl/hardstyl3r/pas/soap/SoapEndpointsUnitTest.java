@@ -26,7 +26,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-class SoapEndpointsUnitTest {
+class SoapEndpointsUnitTest extends BaseMongoIntegrationTest {
 
     @Mock
     private UserViewPort userViewPort;
