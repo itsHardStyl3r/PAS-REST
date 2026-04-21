@@ -1,0 +1,49 @@
+@host = http://localhost:8080
+@soapNs = http://p.lodz.pl/pas/soap
+
+### WSDL dla ViewSoap
+GET {{host}}/ws/pas.wsdl
+Accept: text/xml
+
+### SOAP: pobierz użytkownika po username
+POST {{host}}/ws
+Content-Type: text/xml; charset=UTF-8
+SOAPAction:
+
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:tns="{{soapNs}}">
+  <soapenv:Header/>
+  <soapenv:Body>
+    <tns:GetUserByUsernameRequest>
+      <tns:username>rwalczak</tns:username>
+    </tns:GetUserByUsernameRequest>
+  </soapenv:Body>
+</soapenv:Envelope>
+
+### SOAP: pobierz listę zasobów
+POST {{host}}/ws
+Content-Type: text/xml; charset=UTF-8
+SOAPAction:
+
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:tns="{{soapNs}}">
+  <soapenv:Header/>
+  <soapenv:Body>
+    <tns:GetResourcesRequest/>
+  </soapenv:Body>
+</soapenv:Envelope>
+
+### SOAP: utwórz alokację
+### Uwaga: userId i resourceId muszą istnieć w aplikacji.
+POST {{host}}/ws
+Content-Type: text/xml; charset=UTF-8
+SOAPAction:
+
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:tns="{{soapNs}}">
+  <soapenv:Header/>
+  <soapenv:Body>
+    <tns:CreateAllocationRequest>
+      <tns:userId>60c72b2f9b1e8a3f3c8e4b1b</tns:userId>
+      <tns:resourceId>60c72b2f9b1e8a3f3c8e4b2a</tns:resourceId>
+    </tns:CreateAllocationRequest>
+  </soapenv:Body>
+</soapenv:Envelope>
+
