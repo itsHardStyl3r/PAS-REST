@@ -6,14 +6,15 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
-import pl.hardstyl3r.rentservice.dto.AllocationRequest;
-import pl.hardstyl3r.rentservice.services.AllocationService;
+import pl.hardstyl3r.pas.appports.UserPort;
 import pl.hardstyl3r.pas.v1.exceptions.ResourceNotFoundException;
 import pl.hardstyl3r.pas.v1.exceptions.UserNotFoundException;
 import pl.hardstyl3r.pas.v1.exceptions.UserValidationException;
 import pl.hardstyl3r.pas.v1.objects.Allocation;
-import pl.hardstyl3r.pas.v1.objects.User;
-import pl.hardstyl3r.pas.appports.UserPort;
+import pl.hardstyl3r.rentservice.domain.Client;
+import pl.hardstyl3r.rentservice.domain.ClientMapper;
+import pl.hardstyl3r.rentservice.dto.AllocationRequest;
+import pl.hardstyl3r.rentservice.services.AllocationService;
 
 import java.util.List;
 
@@ -46,17 +47,14 @@ public class AllocationController {
     @PreAuthorize("hasAnyRole('ADMIN', 'RESOURCE_MANAGER', 'CLIENT')")
     public ResponseEntity<Allocation> createAllocation(@Valid @RequestBody AllocationRequest allocationRequest) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        String currentUsername = auth.getName();
-
         boolean isClient = auth.getAuthorities().stream()
                 .anyMatch(a -> a.getAuthority().equals("ROLE_CLIENT"));
 
         String targetUserId;
 
         if (isClient) {
-            User currentUser = userPort.findByUsername(currentUsername)
-                    .orElseThrow(() -> new UserNotFoundException("Nie znaleziono zalogowanego użytkownika."));
-            targetUserId = currentUser.getId();
+            Client currentClient = currentClient(auth.getName());
+            targetUserId = currentClient.getId();
         } else {
             if (allocationRequest.userId() == null || allocationRequest.userId().isBlank()) {
                 throw new UserValidationException("Admin/Manager musi podać ID użytkownika docelowego.");
@@ -96,6 +94,12 @@ public class AllocationController {
         return allocationService.getPastAllocationsForUser(userId);
     }
 
+    private Client currentClient(String username) {
+        return userPort.findByUsername(username)
+                .map(ClientMapper::fromUser)
+                .orElseThrow(() -> new UserNotFoundException("Nie znaleziono zalogowanego użytkownika."));
+    }
+
     private void validateAccessToUserData(String requestedUserId) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 
@@ -103,11 +107,8 @@ public class AllocationController {
                 .anyMatch(a -> a.getAuthority().equals("ROLE_CLIENT"));
 
         if (isClient) {
-            String currentUsername = auth.getName();
-            User currentUser = userPort.findByUsername(currentUsername)
-                    .orElseThrow(() -> new UserNotFoundException("Nie znaleziono zalogowanego użytkownika."));
-
-            if (!currentUser.getId().equals(requestedUserId)) {
+            Client currentClient = currentClient(auth.getName());
+            if (!currentClient.getId().equals(requestedUserId)) {
                 throw new org.springframework.security.access.AccessDeniedException(
                         "Nie masz uprawnień do przeglądania alokacji innego użytkownika."
                 );

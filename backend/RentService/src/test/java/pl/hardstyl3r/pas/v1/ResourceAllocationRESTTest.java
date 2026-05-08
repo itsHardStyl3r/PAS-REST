@@ -5,7 +5,9 @@ import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 import org.bson.Document;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -32,7 +34,7 @@ import static org.hamcrest.Matchers.hasSize;
 @ActiveProfiles("test")
 @SpringBootTest(classes = RentServiceApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class ResourceAllocationRESTTest {
+class ResourceAllocationRESTTest extends MongoIntegrationTestBase {
 
     @Autowired
     private MongoTemplate mongoTemplate;
@@ -55,15 +57,6 @@ class ResourceAllocationRESTTest {
     private String allocatedResourceId;
     private String unallocatedResourceId;
     private String adminToken;
-
-    @BeforeAll
-    void checkDatabaseConnection() {
-        try {
-            mongoTemplate.getDb().runCommand(new Document("ping", 1));
-        } catch (Exception e) {
-            Assumptions.abort("Could not connect to MongoDB. Skipping integration tests.");
-        }
-    }
 
     @BeforeEach
     void setup() {

@@ -6,8 +6,9 @@ import pl.hardstyl3r.pas.appports.ResourcePort;
 import pl.hardstyl3r.pas.appports.UserPort;
 import pl.hardstyl3r.pas.v1.exceptions.*;
 import pl.hardstyl3r.pas.v1.objects.Allocation;
-import pl.hardstyl3r.pas.v1.objects.User;
 import pl.hardstyl3r.pas.v1.viewports.AllocationViewPort;
+import pl.hardstyl3r.rentservice.domain.Client;
+import pl.hardstyl3r.rentservice.domain.ClientMapper;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -39,12 +40,10 @@ public class AllocationService implements AllocationViewPort {
 
     @Override
     public Allocation createAllocation(String userId, String resourceId) {
-        User user = userPort.findById(userId)
+        Client client = userPort.findById(userId)
+                .map(ClientMapper::fromUser)
+                .filter(Client::isActive)
                 .orElseThrow(() -> new UserNotFoundException("User with id " + userId + " not found."));
-
-        if (!user.isActive()) {
-            throw new UserNotActiveException("User with id " + userId + " is not active.");
-        }
 
         resourcePort.findById(resourceId)
                 .orElseThrow(() -> new ResourceNotFoundException("Resource with id " + resourceId + " not found."));
@@ -53,7 +52,7 @@ public class AllocationService implements AllocationViewPort {
             throw new ResourceInUseException("Resource with id " + resourceId + " is already allocated.");
         }
 
-        Allocation allocation = new Allocation(userId, resourceId);
+        Allocation allocation = new Allocation(client.getId(), resourceId);
         return allocationPort.save(allocation);
     }
 

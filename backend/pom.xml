@@ -13,10 +13,8 @@
     <version>0.1-SNAPSHOT</version>
     <packaging>pom</packaging>
     <modules>
-        <module>ApplicationCore/DomainModel</module>
-        <module>ApplicationCore/ApplicationPorts</module>
-        <module>ApplicationCore/ViewPorts</module>
-        <module>adapters/RepositoriesAdapters</module>
+        <module>ApplicationCore</module>
+        <module>adapters</module>
         <module>UserService</module>
         <module>RentService</module>
     </modules>
@@ -45,6 +43,13 @@
     </properties>
     <dependencyManagement>
         <dependencies>
+            <dependency>
+                <groupId>org.testcontainers</groupId>
+                <artifactId>testcontainers-bom</artifactId>
+                <version>1.21.3</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
             <dependency>
                 <groupId>pl.hardstyl3r</groupId>
                 <artifactId>DomainModel</artifactId>
