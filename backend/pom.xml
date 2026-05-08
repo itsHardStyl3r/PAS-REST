@@ -13,8 +13,12 @@
     <version>0.1-SNAPSHOT</version>
     <packaging>pom</packaging>
     <modules>
-        <module>adapters</module>
-        <module>ApplicationCore</module>
+        <module>ApplicationCore/DomainModel</module>
+        <module>ApplicationCore/ApplicationPorts</module>
+        <module>ApplicationCore/ViewPorts</module>
+        <module>adapters/RepositoriesAdapters</module>
+        <module>UserService</module>
+        <module>RentService</module>
     </modules>
     <url/>
     <licenses>
@@ -53,12 +57,12 @@
             </dependency>
             <dependency>
                 <groupId>pl.hardstyl3r</groupId>
-                <artifactId>ApplicationServices</artifactId>
+                <artifactId>ViewPorts</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>pl.hardstyl3r</groupId>
-                <artifactId>ViewPorts</artifactId>
+                <artifactId>RepositoriesAdapters</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
