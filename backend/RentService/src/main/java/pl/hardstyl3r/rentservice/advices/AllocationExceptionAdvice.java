@@ -4,7 +4,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import pl.hardstyl3r.pas.v1.exceptions.AllocationException;
+import pl.hardstyl3r.rentservice.domain.exception.AllocationException;
 
 @RestControllerAdvice
 public class AllocationExceptionAdvice {

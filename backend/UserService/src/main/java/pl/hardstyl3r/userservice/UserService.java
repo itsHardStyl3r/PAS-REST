@@ -2,11 +2,12 @@ package pl.hardstyl3r.userservice;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import pl.hardstyl3r.pas.appports.UserPort;
-import pl.hardstyl3r.pas.v1.exceptions.*;
-import pl.hardstyl3r.pas.v1.objects.User;
-import pl.hardstyl3r.pas.v1.objects.UserRole;
-import pl.hardstyl3r.pas.v1.viewports.UserViewPort;
+import pl.hardstyl3r.userservice.domain.User;
+import pl.hardstyl3r.userservice.domain.UserRole;
+import pl.hardstyl3r.userservice.domain.exception.UserNotFoundException;
+import pl.hardstyl3r.userservice.domain.exception.UserValidationException;
+import pl.hardstyl3r.userservice.ports.driven.UserPort;
+import pl.hardstyl3r.userservice.ports.driving.UserViewPort;
 
 import java.util.List;
 import java.util.Optional;

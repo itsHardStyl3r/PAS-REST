@@ -5,8 +5,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-import pl.hardstyl3r.pas.appports.UserPort;
-import pl.hardstyl3r.pas.v1.objects.User;
+import pl.hardstyl3r.userservice.domain.User;
+import pl.hardstyl3r.userservice.ports.driven.UserPort;
 
 import java.util.Collections;
 

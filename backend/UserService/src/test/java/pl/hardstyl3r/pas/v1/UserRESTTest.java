@@ -23,7 +23,7 @@ import pl.hardstyl3r.userservice.dto.EditUserDTO;
 import pl.hardstyl3r.userservice.dto.LoginRequest;
 import pl.hardstyl3r.userservice.dto.RegisterRequest;
 import pl.hardstyl3r.userservice.dto.UserDTO;
-import pl.hardstyl3r.pas.v1.objects.UserRole;
+import pl.hardstyl3r.userservice.domain.UserRole;
 import pl.hardstyl3r.userservice.UserServiceApplication;
 
 import java.util.Arrays;

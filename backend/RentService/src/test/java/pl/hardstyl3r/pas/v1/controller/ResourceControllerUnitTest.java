@@ -10,10 +10,9 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import pl.hardstyl3r.rentservice.controller.ResourceController;
+import pl.hardstyl3r.rentservice.domain.resource.Book;
 import pl.hardstyl3r.rentservice.dto.CreateResourceDTO;
-import pl.hardstyl3r.pas.v1.objects.resources.Book;
 import pl.hardstyl3r.rentservice.services.ResourceService;
-import pl.hardstyl3r.pas.v1.viewports.ResourceViewPort;
 
 import java.util.List;
 import java.util.Optional;

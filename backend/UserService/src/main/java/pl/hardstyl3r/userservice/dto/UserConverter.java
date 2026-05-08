@@ -1,6 +1,6 @@
 package pl.hardstyl3r.userservice.dto;
 
-import pl.hardstyl3r.pas.v1.objects.User;
+import pl.hardstyl3r.userservice.domain.User;
 
 import java.util.List;
 

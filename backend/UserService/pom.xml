@@ -13,23 +13,6 @@
 
     <dependencies>
         <dependency>
-            <groupId>pl.hardstyl3r</groupId>
-            <artifactId>ApplicationPorts</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>pl.hardstyl3r</groupId>
-            <artifactId>ViewPorts</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>pl.hardstyl3r</groupId>
-            <artifactId>DomainModel</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>pl.hardstyl3r</groupId>
-            <artifactId>RepositoriesAdapters</artifactId>
-        </dependency>
-
-        <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>

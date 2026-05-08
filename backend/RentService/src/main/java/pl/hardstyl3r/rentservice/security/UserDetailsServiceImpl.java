@@ -5,33 +5,35 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-import pl.hardstyl3r.pas.appports.UserPort;
-import pl.hardstyl3r.pas.v1.objects.User;
+import pl.hardstyl3r.rentservice.domain.Client;
+import pl.hardstyl3r.rentservice.ports.driven.ClientPort;
 
 import java.util.Collections;
 
 @Service
 public class UserDetailsServiceImpl implements UserDetailsService {
 
-    private final UserPort userPort;
+    private final ClientPort clientPort;
 
-    public UserDetailsServiceImpl(UserPort userPort) {
-        this.userPort = userPort;
+    public UserDetailsServiceImpl(ClientPort clientPort) {
+        this.clientPort = clientPort;
     }
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = userPort.findByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException("User Not Found with username: " + username));
+        Client client = clientPort.findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException("Client not found with username: " + username));
+
+        String role = client.getRole() != null ? client.getRole().name() : "CLIENT";
 
         return new org.springframework.security.core.userdetails.User(
-                user.getUsername(),
-                user.getPassword(),
-                user.isActive(),
+                client.getUsername(),
+                "",
+                client.isActive(),
                 true,
                 true,
                 true,
-                Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + user.getRole().name()))
+                Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + role))
         );
     }
 }

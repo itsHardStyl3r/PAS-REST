@@ -21,8 +21,7 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 import pl.hardstyl3r.rentservice.dto.AllocationRequest;
-import pl.hardstyl3r.pas.v1.objects.UserRole;
-import pl.hardstyl3r.pas.v1.objects.resources.Book;
+import pl.hardstyl3r.rentservice.domain.resource.Book;
 import pl.hardstyl3r.rentservice.security.JwtUtil;
 import pl.hardstyl3r.rentservice.RentServiceApplication;
 
@@ -52,8 +51,8 @@ class AllocationRESTTest extends MongoIntegrationTestBase {
     @LocalServerPort
     private int port;
 
-    @Value("${pas.mongodb.collection.users}")
-    private String usersCollectionName;
+    @Value("${pas.mongodb.collection.clients}")
+    private String clientsCollectionName;
     @Value("${pas.mongodb.collection.resources}")
     private String resourcesCollectionName;
     @Value("${pas.mongodb.collection.allocations}")
@@ -70,26 +69,26 @@ class AllocationRESTTest extends MongoIntegrationTestBase {
     void setup() {
         RestAssured.port = port;
 
-        mongoTemplate.dropCollection(usersCollectionName);
+        mongoTemplate.dropCollection(clientsCollectionName);
         mongoTemplate.dropCollection(resourcesCollectionName);
         mongoTemplate.dropCollection(allocationsCollectionName);
 
-        MongoCollection<Document> users = mongoTemplate.createCollection(usersCollectionName);
+        MongoCollection<Document> users = mongoTemplate.createCollection(clientsCollectionName);
         MongoCollection<Document> resources = mongoTemplate.createCollection(resourcesCollectionName);
         MongoCollection<Document> allocations = mongoTemplate.createCollection(allocationsCollectionName);
 
-        Document adminUser = new Document("username", "admin").append("name", "Admin User").append("active", true).append("password", passwordEncoder.encode("password")).append("role", UserRole.ADMIN.name());
+        Document adminUser = new Document("username", "admin").append("name", "Admin User").append("active", true).append("password", passwordEncoder.encode("password")).append("role", "ADMIN");
         users.insertOne(adminUser);
         activeUserId = adminUser.getObjectId("_id").toHexString();
 
-        Document inactiveUser = new Document("username", "user").append("name", "Inactive User").append("active", false).append("password", passwordEncoder.encode("password")).append("role", UserRole.CLIENT.name());
+        Document inactiveUser = new Document("username", "user").append("name", "Inactive User").append("active", false).append("password", passwordEncoder.encode("password")).append("role", "CLIENT");
         users.insertOne(inactiveUser);
         inactiveUserId = inactiveUser.getObjectId("_id").toHexString();
 
         adminToken = jwtUtil.generateToken(new User("admin", "password", List.of(new SimpleGrantedAuthority("ROLE_ADMIN"))));
 
-        Document availableResource = new Document("_class", "pl.hardstyl3r.repoadapters.objects.resources.BookEnt").append("name", "Available Book");
-        Document allocatedResource = new Document("_class", "pl.hardstyl3r.repoadapters.objects.resources.BookEnt").append("name", "Allocated Book");
+        Document availableResource = new Document("_class", "pl.hardstyl3r.rentservice.adapters.resource.BookEnt").append("name", "Available Book");
+        Document allocatedResource = new Document("_class", "pl.hardstyl3r.rentservice.adapters.resource.BookEnt").append("name", "Allocated Book");
         resources.insertMany(Arrays.asList(availableResource, allocatedResource));
         availableResourceId = availableResource.getObjectId("_id").toHexString();
         allocatedResourceId = allocatedResource.getObjectId("_id").toHexString();

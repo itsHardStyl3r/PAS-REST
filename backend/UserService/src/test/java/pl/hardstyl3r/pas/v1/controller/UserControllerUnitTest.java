@@ -10,11 +10,11 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import pl.hardstyl3r.userservice.controller.UserController;
+import pl.hardstyl3r.userservice.domain.User;
+import pl.hardstyl3r.userservice.domain.UserRole;
 import pl.hardstyl3r.userservice.dto.EditUserDTO;
+import pl.hardstyl3r.userservice.ports.driving.UserViewPort;
 import pl.hardstyl3r.userservice.security.JwtUtil;
-import pl.hardstyl3r.pas.v1.objects.User;
-import pl.hardstyl3r.pas.v1.objects.UserRole;
-import pl.hardstyl3r.pas.v1.viewports.UserViewPort;
 
 import java.util.Optional;
 

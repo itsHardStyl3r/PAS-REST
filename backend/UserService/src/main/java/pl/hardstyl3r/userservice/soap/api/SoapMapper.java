@@ -1,6 +1,6 @@
 package pl.hardstyl3r.userservice.soap.api;
 
-import pl.hardstyl3r.pas.v1.objects.User;
+import pl.hardstyl3r.userservice.domain.User;
 
 public final class SoapMapper {
 

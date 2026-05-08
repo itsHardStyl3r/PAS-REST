@@ -11,12 +11,12 @@ import pl.hardstyl3r.userservice.dto.ChangePasswordRequest;
 import pl.hardstyl3r.userservice.dto.EditUserDTO;
 import pl.hardstyl3r.userservice.dto.UserConverter;
 import pl.hardstyl3r.userservice.dto.UserDTO;
-import pl.hardstyl3r.pas.v1.exceptions.UserNotFoundException;
-import pl.hardstyl3r.pas.v1.exceptions.UserValidationException;
-import pl.hardstyl3r.pas.v1.objects.User;
-import pl.hardstyl3r.pas.v1.objects.UserRole;
+import pl.hardstyl3r.userservice.domain.User;
+import pl.hardstyl3r.userservice.domain.UserRole;
+import pl.hardstyl3r.userservice.domain.exception.UserNotFoundException;
+import pl.hardstyl3r.userservice.domain.exception.UserValidationException;
+import pl.hardstyl3r.userservice.ports.driving.UserViewPort;
 import pl.hardstyl3r.userservice.security.JwtUtil;
-import pl.hardstyl3r.pas.v1.viewports.UserViewPort;
 import pl.hardstyl3r.userservice.UserService;
 
 import java.util.List;

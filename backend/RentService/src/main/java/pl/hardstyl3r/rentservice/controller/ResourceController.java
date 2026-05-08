@@ -3,13 +3,13 @@ package pl.hardstyl3r.rentservice.controller;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import pl.hardstyl3r.rentservice.domain.exception.ResourceNotFoundException;
+import pl.hardstyl3r.rentservice.domain.resource.Resource;
 import pl.hardstyl3r.rentservice.dto.CreateResourceDTO;
 import pl.hardstyl3r.rentservice.dto.EditResourceDTO;
+import pl.hardstyl3r.rentservice.ports.driving.CreateResourceCommand;
+import pl.hardstyl3r.rentservice.ports.driving.EditResourceCommand;
 import pl.hardstyl3r.rentservice.services.ResourceService;
-import pl.hardstyl3r.pas.v1.exceptions.ResourceNotFoundException;
-import pl.hardstyl3r.pas.v1.objects.resources.Resource;
-import pl.hardstyl3r.pas.v1.viewports.CreateResourceCommand;
-import pl.hardstyl3r.pas.v1.viewports.EditResourceCommand;
 
 import java.util.List;
 

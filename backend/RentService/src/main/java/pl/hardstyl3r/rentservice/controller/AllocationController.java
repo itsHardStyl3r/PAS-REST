@@ -6,14 +6,13 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
-import pl.hardstyl3r.pas.appports.UserPort;
-import pl.hardstyl3r.pas.v1.exceptions.ResourceNotFoundException;
-import pl.hardstyl3r.pas.v1.exceptions.UserNotFoundException;
-import pl.hardstyl3r.pas.v1.exceptions.UserValidationException;
-import pl.hardstyl3r.pas.v1.objects.Allocation;
+import pl.hardstyl3r.rentservice.domain.Allocation;
 import pl.hardstyl3r.rentservice.domain.Client;
-import pl.hardstyl3r.rentservice.domain.ClientMapper;
+import pl.hardstyl3r.rentservice.domain.exception.UserNotFoundException;
+import pl.hardstyl3r.rentservice.domain.exception.UserValidationException;
+import pl.hardstyl3r.rentservice.domain.exception.ResourceNotFoundException;
 import pl.hardstyl3r.rentservice.dto.AllocationRequest;
+import pl.hardstyl3r.rentservice.ports.driven.ClientPort;
 import pl.hardstyl3r.rentservice.services.AllocationService;
 
 import java.util.List;
@@ -24,11 +23,11 @@ import java.util.List;
 public class AllocationController {
 
     private final AllocationService allocationService;
-    private final UserPort userPort;
+    private final ClientPort clientPort;
 
-    public AllocationController(AllocationService allocationService, UserPort userPort) {
+    public AllocationController(AllocationService allocationService, ClientPort clientPort) {
         this.allocationService = allocationService;
-        this.userPort = userPort;
+        this.clientPort = clientPort;
     }
 
     @GetMapping
@@ -95,14 +94,12 @@ public class AllocationController {
     }
 
     private Client currentClient(String username) {
-        return userPort.findByUsername(username)
-                .map(ClientMapper::fromUser)
-                .orElseThrow(() -> new UserNotFoundException("Nie znaleziono zalogowanego użytkownika."));
+        return clientPort.findByUsername(username)
+                .orElseThrow(() -> new UserNotFoundException("Nie znaleziono zalogowanego klienta."));
     }
 
     private void validateAccessToUserData(String requestedUserId) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-
         boolean isClient = auth.getAuthorities().stream()
                 .anyMatch(a -> a.getAuthority().equals("ROLE_CLIENT"));
 

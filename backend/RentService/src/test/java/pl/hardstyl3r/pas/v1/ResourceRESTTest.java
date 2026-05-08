@@ -19,10 +19,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 import pl.hardstyl3r.rentservice.dto.CreateResourceDTO;
 import pl.hardstyl3r.rentservice.dto.EditResourceDTO;
-import pl.hardstyl3r.pas.v1.objects.UserRole;
-import pl.hardstyl3r.pas.v1.objects.resources.Book;
-import pl.hardstyl3r.pas.v1.objects.resources.Newspaper;
-import pl.hardstyl3r.pas.v1.objects.resources.Periodical;
+import pl.hardstyl3r.rentservice.domain.resource.Book;
+import pl.hardstyl3r.rentservice.domain.resource.Newspaper;
+import pl.hardstyl3r.rentservice.domain.resource.Periodical;
 import pl.hardstyl3r.rentservice.security.JwtUtil;
 import pl.hardstyl3r.rentservice.RentServiceApplication;
 
@@ -51,8 +50,8 @@ class ResourceRESTTest extends MongoIntegrationTestBase {
 
     @Value("${pas.mongodb.collection.resources}")
     private String resourcesCollectionName;
-    @Value("${pas.mongodb.collection.users}")
-    private String usersCollectionName;
+    @Value("${pas.mongodb.collection.clients}")
+    private String clientsCollectionName;
 
     private String bookId;
     private String periodicalId;
@@ -65,20 +64,20 @@ class ResourceRESTTest extends MongoIntegrationTestBase {
         RestAssured.port = port;
 
         mongoTemplate.dropCollection(resourcesCollectionName);
-        mongoTemplate.dropCollection(usersCollectionName);
+        mongoTemplate.dropCollection(clientsCollectionName);
         MongoCollection<Document> resourcesCollection = mongoTemplate.createCollection(resourcesCollectionName);
-        MongoCollection<Document> usersCollection = mongoTemplate.createCollection(usersCollectionName);
+        MongoCollection<Document> usersCollection = mongoTemplate.createCollection(clientsCollectionName);
 
-        Document adminUser = new Document("username", "admin").append("password", passwordEncoder.encode("password")).append("role", UserRole.ADMIN.name()).append("active", true);
-        Document clientUser = new Document("username", "client").append("password", passwordEncoder.encode("password")).append("role", UserRole.CLIENT.name()).append("active", true);
+        Document adminUser = new Document("username", "admin").append("password", passwordEncoder.encode("password")).append("role", "ADMIN").append("active", true);
+        Document clientUser = new Document("username", "client").append("password", passwordEncoder.encode("password")).append("role", "CLIENT").append("active", true);
         usersCollection.insertMany(Arrays.asList(adminUser, clientUser));
 
         adminToken = jwtUtil.generateToken(new User("admin", "password", List.of(new SimpleGrantedAuthority("ROLE_ADMIN"))));
         clientToken = jwtUtil.generateToken(new User("client", "password", List.of(new SimpleGrantedAuthority("ROLE_CLIENT"))));
 
-        Document book1 = new Document("_class", "pl.hardstyl3r.repoadapters.objects.resources.BookEnt").append("name", "Morderstwo w Orient Expressie").append("description", "Herkules Poirot...").append("author", "Agatha Christie").append("isbn", "9788327159779");
-        Document periodical = new Document("_class", "pl.hardstyl3r.repoadapters.objects.resources.PeriodicalEnt").append("name", "CD-Action").append("description", "Magazyn...").append("issueNumber", 320);
-        Document newspaper = new Document("_class", "pl.hardstyl3r.repoadapters.objects.resources.NewspaperEnt").append("name", "Gazeta Wyborcza").append("description", "Gazeta").append("releaseDate", "2025-11-17");
+        Document book1 = new Document("_class", "pl.hardstyl3r.rentservice.adapters.resource.BookEnt").append("name", "Morderstwo w Orient Expressie").append("description", "Herkules Poirot...").append("author", "Agatha Christie").append("isbn", "9788327159779");
+        Document periodical = new Document("_class", "pl.hardstyl3r.rentservice.adapters.resource.PeriodicalEnt").append("name", "CD-Action").append("description", "Magazyn...").append("issueNumber", 320);
+        Document newspaper = new Document("_class", "pl.hardstyl3r.rentservice.adapters.resource.NewspaperEnt").append("name", "Gazeta Wyborcza").append("description", "Gazeta").append("releaseDate", "2025-11-17");
         resourcesCollection.insertMany(Arrays.asList(book1, periodical, newspaper));
 
         this.bookId = Objects.requireNonNull(resourcesCollection.find(Filters.eq("name", "Morderstwo w Orient Expressie")).first()).getObjectId("_id").toHexString();

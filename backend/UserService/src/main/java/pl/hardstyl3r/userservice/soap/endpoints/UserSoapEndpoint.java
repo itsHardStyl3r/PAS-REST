@@ -7,8 +7,8 @@ import org.springframework.ws.server.endpoint.annotation.ResponsePayload;
 import pl.hardstyl3r.userservice.soap.api.GetUserByUsernameRequest;
 import pl.hardstyl3r.userservice.soap.api.GetUserByUsernameResponse;
 import pl.hardstyl3r.userservice.soap.api.SoapMapper;
-import pl.hardstyl3r.pas.v1.exceptions.UserNotFoundException;
-import pl.hardstyl3r.pas.v1.viewports.UserViewPort;
+import pl.hardstyl3r.userservice.domain.exception.UserNotFoundException;
+import pl.hardstyl3r.userservice.ports.driving.UserViewPort;
 
 @Endpoint
 public class UserSoapEndpoint {

@@ -1,14 +1,16 @@
 package pl.hardstyl3r.rentservice.services;
 
 import org.springframework.stereotype.Service;
-import pl.hardstyl3r.pas.appports.AllocationPort;
-import pl.hardstyl3r.pas.appports.ResourcePort;
-import pl.hardstyl3r.pas.appports.UserPort;
-import pl.hardstyl3r.pas.v1.exceptions.*;
-import pl.hardstyl3r.pas.v1.objects.Allocation;
-import pl.hardstyl3r.pas.v1.viewports.AllocationViewPort;
+import pl.hardstyl3r.rentservice.domain.Allocation;
 import pl.hardstyl3r.rentservice.domain.Client;
-import pl.hardstyl3r.rentservice.domain.ClientMapper;
+import pl.hardstyl3r.rentservice.domain.exception.AllocationException;
+import pl.hardstyl3r.rentservice.domain.exception.ResourceInUseException;
+import pl.hardstyl3r.rentservice.domain.exception.ResourceNotFoundException;
+import pl.hardstyl3r.rentservice.domain.exception.UserNotFoundException;
+import pl.hardstyl3r.rentservice.ports.driven.AllocationPort;
+import pl.hardstyl3r.rentservice.ports.driven.ClientPort;
+import pl.hardstyl3r.rentservice.ports.driven.ResourcePort;
+import pl.hardstyl3r.rentservice.ports.driving.AllocationViewPort;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -19,12 +21,12 @@ import java.util.stream.Collectors;
 public class AllocationService implements AllocationViewPort {
 
     private final AllocationPort allocationPort;
-    private final UserPort userPort;
+    private final ClientPort clientPort;
     private final ResourcePort resourcePort;
 
-    public AllocationService(AllocationPort allocationPort, UserPort userPort, ResourcePort resourcePort) {
+    public AllocationService(AllocationPort allocationPort, ClientPort clientPort, ResourcePort resourcePort) {
         this.allocationPort = allocationPort;
-        this.userPort = userPort;
+        this.clientPort = clientPort;
         this.resourcePort = resourcePort;
     }
 
@@ -40,10 +42,9 @@ public class AllocationService implements AllocationViewPort {
 
     @Override
     public Allocation createAllocation(String userId, String resourceId) {
-        Client client = userPort.findById(userId)
-                .map(ClientMapper::fromUser)
+        Client client = clientPort.findById(userId)
                 .filter(Client::isActive)
-                .orElseThrow(() -> new UserNotFoundException("User with id " + userId + " not found."));
+                .orElseThrow(() -> new UserNotFoundException("Client with id " + userId + " not found or inactive."));
 
         resourcePort.findById(resourceId)
                 .orElseThrow(() -> new ResourceNotFoundException("Resource with id " + resourceId + " not found."));

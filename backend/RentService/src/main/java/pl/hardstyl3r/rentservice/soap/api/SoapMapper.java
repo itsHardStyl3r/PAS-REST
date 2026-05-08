@@ -1,7 +1,7 @@
 package pl.hardstyl3r.rentservice.soap.api;
 
-import pl.hardstyl3r.pas.v1.objects.Allocation;
-import pl.hardstyl3r.pas.v1.objects.resources.Resource;
+import pl.hardstyl3r.rentservice.domain.Allocation;
+import pl.hardstyl3r.rentservice.domain.resource.Resource;
 
 public final class SoapMapper {
 

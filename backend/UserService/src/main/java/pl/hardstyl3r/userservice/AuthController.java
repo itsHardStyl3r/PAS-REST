@@ -11,11 +11,11 @@ import org.springframework.web.bind.annotation.*;
 import pl.hardstyl3r.userservice.dto.JwtResponse;
 import pl.hardstyl3r.userservice.dto.LoginRequest;
 import pl.hardstyl3r.userservice.dto.RegisterRequest;
-import pl.hardstyl3r.pas.v1.exceptions.UserNotFoundException;
-import pl.hardstyl3r.pas.v1.exceptions.UsernameIsTakenException;
+import pl.hardstyl3r.userservice.domain.User;
+import pl.hardstyl3r.userservice.domain.exception.UserNotFoundException;
+import pl.hardstyl3r.userservice.domain.exception.UsernameIsTakenException;
 import pl.hardstyl3r.userservice.security.UserDetailsServiceImpl;
 import pl.hardstyl3r.userservice.security.JwtUtil;
-import pl.hardstyl3r.pas.v1.objects.User;
 
 import java.util.Map;
 

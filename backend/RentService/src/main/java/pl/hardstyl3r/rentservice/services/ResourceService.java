@@ -1,18 +1,18 @@
 package pl.hardstyl3r.rentservice.services;
 
 import org.springframework.stereotype.Service;
-import pl.hardstyl3r.pas.appports.AllocationPort;
-import pl.hardstyl3r.pas.appports.ResourcePort;
-import pl.hardstyl3r.pas.v1.exceptions.ResourceInUseException;
-import pl.hardstyl3r.pas.v1.exceptions.ResourceNotFoundException;
-import pl.hardstyl3r.pas.v1.exceptions.ResourceValidationException;
-import pl.hardstyl3r.pas.v1.objects.resources.Book;
-import pl.hardstyl3r.pas.v1.objects.resources.Newspaper;
-import pl.hardstyl3r.pas.v1.objects.resources.Periodical;
-import pl.hardstyl3r.pas.v1.objects.resources.Resource;
-import pl.hardstyl3r.pas.v1.viewports.CreateResourceCommand;
-import pl.hardstyl3r.pas.v1.viewports.EditResourceCommand;
-import pl.hardstyl3r.pas.v1.viewports.ResourceViewPort;
+import pl.hardstyl3r.rentservice.domain.exception.ResourceInUseException;
+import pl.hardstyl3r.rentservice.domain.exception.ResourceNotFoundException;
+import pl.hardstyl3r.rentservice.domain.exception.ResourceValidationException;
+import pl.hardstyl3r.rentservice.domain.resource.Book;
+import pl.hardstyl3r.rentservice.domain.resource.Newspaper;
+import pl.hardstyl3r.rentservice.domain.resource.Periodical;
+import pl.hardstyl3r.rentservice.domain.resource.Resource;
+import pl.hardstyl3r.rentservice.ports.driven.AllocationPort;
+import pl.hardstyl3r.rentservice.ports.driven.ResourcePort;
+import pl.hardstyl3r.rentservice.ports.driving.CreateResourceCommand;
+import pl.hardstyl3r.rentservice.ports.driving.EditResourceCommand;
+import pl.hardstyl3r.rentservice.ports.driving.ResourceViewPort;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
@@ -41,8 +41,8 @@ public class ResourceService implements ResourceViewPort {
 
     private boolean isValidIsbn(String isbn) {
         if (isbn == null) return false;
-        String cleanedIsbn = isbn.replace("-", "");
-        return cleanedIsbn.matches("^(?:978|979)?\\d{10}$") || cleanedIsbn.matches("^\\d{9}[\\dXx]$");
+        String cleaned = isbn.replace("-", "");
+        return cleaned.matches("^(?:978|979)?\\d{10}$") || cleaned.matches("^\\d{9}[\\dXx]$");
     }
 
     private boolean isValidDate(String date) {
@@ -72,7 +72,7 @@ public class ResourceService implements ResourceViewPort {
                 resource = new Periodical(null, command.name(), command.description(), command.issueNumber());
                 break;
             case "newspaper":
-                if (command.releaseDate() == null || !isValidDate(command.releaseDate())) {
+                if (!isValidDate(command.releaseDate())) {
                     throw new ResourceValidationException("Valid release date is required for a newspaper.");
                 }
                 resource = new Newspaper(null, command.name(), command.description(), command.releaseDate());

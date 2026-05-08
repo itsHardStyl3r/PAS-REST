@@ -7,9 +7,9 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import pl.hardstyl3r.pas.appports.UserPort;
-import pl.hardstyl3r.pas.v1.objects.Allocation;
 import pl.hardstyl3r.rentservice.controller.AllocationController;
+import pl.hardstyl3r.rentservice.domain.Allocation;
+import pl.hardstyl3r.rentservice.ports.driven.ClientPort;
 import pl.hardstyl3r.rentservice.services.AllocationService;
 
 import java.util.List;
@@ -29,11 +29,11 @@ class AllocationControllerUnitTest {
     private AllocationService allocationService;
 
     @Mock
-    private UserPort userPort;
+    private ClientPort clientPort;
 
     @BeforeEach
     void setup() {
-        AllocationController controller = new AllocationController(allocationService, userPort);
+        AllocationController controller = new AllocationController(allocationService, clientPort);
         mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
     }
 
