@@ -1,5 +1,6 @@
 package pl.hardstyl3r.rentservice.controller;
 
+import io.micrometer.core.annotation.Timed;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -44,6 +45,7 @@ public class AllocationController {
 
     @PostMapping
     @PreAuthorize("hasAnyRole('ADMIN', 'RESOURCE_MANAGER', 'CLIENT')")
+    @Timed(value = "rent.allocation.create", description = "Czas tworzenia wypozyczenia")
     public ResponseEntity<Allocation> createAllocation(@Valid @RequestBody AllocationRequest allocationRequest) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         boolean isClient = auth.getAuthorities().stream()

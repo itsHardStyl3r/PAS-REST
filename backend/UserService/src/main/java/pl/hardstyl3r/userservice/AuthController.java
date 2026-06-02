@@ -1,5 +1,7 @@
 package pl.hardstyl3r.userservice;
 
+import io.micrometer.core.annotation.Counted;
+import io.micrometer.core.annotation.Timed;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -37,6 +39,7 @@ public class AuthController {
     }
 
     @PostMapping("/login")
+    @Timed(value = "user.auth.login", description = "Czas logowania uzytkownika")
     public ResponseEntity<?> authenticateUser(@RequestBody LoginRequest loginRequest) {
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(loginRequest.username(), loginRequest.password()));
@@ -55,6 +58,7 @@ public class AuthController {
     }
 
     @PostMapping("/register")
+    @Counted(value = "user.auth.register", description = "Liczba rejestracji uzytkownikow")
     public ResponseEntity<?> registerUser(@Valid @RequestBody RegisterRequest registerRequest) {
         if (userService.findUserByUsername(registerRequest.username()).isPresent()) {
             throw new UsernameIsTakenException(registerRequest.username());
