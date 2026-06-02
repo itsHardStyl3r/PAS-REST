@@ -22,7 +22,6 @@ import pl.hardstyl3r.rentservice.dto.EditResourceDTO;
 import pl.hardstyl3r.rentservice.domain.resource.Book;
 import pl.hardstyl3r.rentservice.domain.resource.Newspaper;
 import pl.hardstyl3r.rentservice.domain.resource.Periodical;
-import pl.hardstyl3r.rentservice.security.JwtUtil;
 import pl.hardstyl3r.rentservice.RentServiceApplication;
 
 import java.util.Arrays;
@@ -42,9 +41,6 @@ class ResourceRESTTest extends MongoIntegrationTestBase {
     private MongoTemplate mongoTemplate;
     @Autowired
     private PasswordEncoder passwordEncoder;
-    @Autowired
-    private JwtUtil jwtUtil;
-
     @LocalServerPort
     private int port;
 
@@ -72,8 +68,8 @@ class ResourceRESTTest extends MongoIntegrationTestBase {
         Document clientUser = new Document("username", "client").append("password", passwordEncoder.encode("password")).append("role", "CLIENT").append("active", true);
         usersCollection.insertMany(Arrays.asList(adminUser, clientUser));
 
-        adminToken = jwtUtil.generateToken(new User("admin", "password", List.of(new SimpleGrantedAuthority("ROLE_ADMIN"))));
-        clientToken = jwtUtil.generateToken(new User("client", "password", List.of(new SimpleGrantedAuthority("ROLE_CLIENT"))));
+        adminToken = TestTokenFactory.generateToken(new User("admin", "password", List.of(new SimpleGrantedAuthority("ROLE_ADMIN"))));
+        clientToken = TestTokenFactory.generateToken(new User("client", "password", List.of(new SimpleGrantedAuthority("ROLE_CLIENT"))));
 
         Document book1 = new Document("_class", "pl.hardstyl3r.rentservice.adapters.resource.BookEnt").append("name", "Morderstwo w Orient Expressie").append("description", "Herkules Poirot...").append("author", "Agatha Christie").append("isbn", "9788327159779");
         Document periodical = new Document("_class", "pl.hardstyl3r.rentservice.adapters.resource.PeriodicalEnt").append("name", "CD-Action").append("description", "Magazyn...").append("issueNumber", 320);

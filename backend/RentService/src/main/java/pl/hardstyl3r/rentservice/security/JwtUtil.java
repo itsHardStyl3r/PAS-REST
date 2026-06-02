@@ -2,29 +2,41 @@ package pl.hardstyl3r.rentservice.security;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.security.Keys;
+import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.Resource;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
-import javax.crypto.SecretKey;
+import java.nio.charset.StandardCharsets;
+import java.security.KeyFactory;
+import java.security.PublicKey;
+import java.security.spec.X509EncodedKeySpec;
+import java.util.Base64;
 import java.util.Date;
 import java.util.function.Function;
 
 @Component
 public class JwtUtil {
 
-    @Value("${jwt.secret}")
-    private String secret;
+    @Value("${jwt.public-key}")
+    private Resource publicKeyResource;
 
-    @Value("${jwt.expiration.ms}")
-    private long jwtExpirationMs;
+    private PublicKey publicKey;
 
-    @Value("${jwt.refresh.expiration.ms}")
-    private long jwtRefreshExpirationMs;
+    @PostConstruct
+    void init() throws Exception {
+        this.publicKey = loadPublicKey(publicKeyResource);
+    }
 
-    private SecretKey getSigningKey() {
-        return Keys.hmacShaKeyFor(secret.getBytes());
+    private PublicKey loadPublicKey(Resource resource) throws Exception {
+        String pem = new String(resource.getInputStream().readAllBytes(), StandardCharsets.UTF_8);
+        String base64 = pem
+                .replace("-----BEGIN PUBLIC KEY-----", "")
+                .replace("-----END PUBLIC KEY-----", "")
+                .replaceAll("\\s", "");
+        byte[] der = Base64.getDecoder().decode(base64);
+        return KeyFactory.getInstance("RSA").generatePublic(new X509EncodedKeySpec(der));
     }
 
     public String extractUsername(String token) {
@@ -38,61 +50,15 @@ public class JwtUtil {
 
     private Claims extractAllClaims(String token) {
         return Jwts.parser()
-                .verifyWith(getSigningKey())
+                .verifyWith(publicKey)
                 .build()
                 .parseSignedClaims(token)
                 .getPayload();
     }
 
-    public String generateToken(UserDetails userDetails) {
-        return Jwts.builder()
-                .subject(userDetails.getUsername())
-                .issuedAt(new Date(System.currentTimeMillis()))
-                .expiration(new Date(System.currentTimeMillis() + jwtExpirationMs))
-                .signWith(getSigningKey())
-                .compact();
-    }
-
-    public String generateRefreshToken(UserDetails userDetails) {
-        return Jwts.builder()
-                .subject(userDetails.getUsername())
-                .issuedAt(new Date())
-                .expiration(new Date(System.currentTimeMillis() + jwtRefreshExpirationMs))
-                .signWith(getSigningKey())
-                .compact();
-    }
-
     public boolean isTokenValid(String token, UserDetails userDetails) {
         final String username = extractUsername(token);
         return (username.equals(userDetails.getUsername())) && !isTokenExpired(token);
-    }
-
-    public String generateValueSignature(String value) {
-        return Jwts.builder()
-                .subject(value)
-                .issuedAt(new Date())
-                .signWith(getSigningKey())
-                .compact();
-    }
-
-    public boolean verifyValueSignature(String value, String jws) {
-        if (jws == null || jws.isBlank()) {
-            return false;
-        }
-
-        String cleanJws = jws.replace("\"", "");
-
-        try {
-            String extractedValue = Jwts.parser()
-                    .verifyWith(getSigningKey())
-                    .build()
-                    .parseSignedClaims(cleanJws)
-                    .getPayload()
-                    .getSubject();
-            return value.equals(extractedValue);
-        } catch (Exception e) {
-            return false;
-        }
     }
 
     private boolean isTokenExpired(String token) {

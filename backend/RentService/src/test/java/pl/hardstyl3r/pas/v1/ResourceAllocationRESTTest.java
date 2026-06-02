@@ -17,7 +17,6 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
-import pl.hardstyl3r.rentservice.security.JwtUtil;
 import pl.hardstyl3r.rentservice.RentServiceApplication;
 
 import java.time.LocalDateTime;
@@ -39,9 +38,6 @@ class ResourceAllocationRESTTest extends MongoIntegrationTestBase {
     private MongoTemplate mongoTemplate;
     @Autowired
     private PasswordEncoder passwordEncoder;
-    @Autowired
-    private JwtUtil jwtUtil;
-
     @LocalServerPort
     private int port;
 
@@ -72,7 +68,7 @@ class ResourceAllocationRESTTest extends MongoIntegrationTestBase {
         Document user = new Document("username", "adminUser").append("name", "Admin User").append("active", true).append("password", passwordEncoder.encode("password")).append("role", "ADMIN");
         users.insertOne(user);
         userId = user.getObjectId("_id").toHexString();
-        adminToken = jwtUtil.generateToken(new User("adminUser", "password", List.of(new SimpleGrantedAuthority("ROLE_ADMIN"))));
+        adminToken = TestTokenFactory.generateToken(new User("adminUser", "password", List.of(new SimpleGrantedAuthority("ROLE_ADMIN"))));
 
         Document allocatedResource = new Document("_class", "pl.hardstyl3r.rentservice.adapters.resource.BookEnt").append("name", "Allocated Book");
         Document unallocatedResource = new Document("_class", "pl.hardstyl3r.rentservice.adapters.resource.BookEnt").append("name", "Unallocated Book");
