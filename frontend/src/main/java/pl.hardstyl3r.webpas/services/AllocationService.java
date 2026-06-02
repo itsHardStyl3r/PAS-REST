@@ -1,5 +1,7 @@
 package pl.hardstyl3r.webpas.services;
 
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+import io.github.resilience4j.retry.annotation.Retry;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
@@ -37,6 +39,8 @@ public class AllocationService {
         return headers;
     }
 
+    @CircuitBreaker(name = "rentService", fallbackMethod = "getAllAllocationsFallback")
+    @Retry(name = "rentService")
     public List<AllocationDTO> getAllAllocations() {
         String url = rentApiUrl + "/api/v1/allocations";
         HttpEntity<Void> entity = new HttpEntity<>(authHeaders());
@@ -49,15 +53,23 @@ public class AllocationService {
         return response.getBody();
     }
 
+    @CircuitBreaker(name = "rentService")
+    @Retry(name = "rentService")
     public void createAllocation(AllocationRequest allocationRequest) {
         String url = rentApiUrl + "/api/v1/allocations";
         HttpEntity<AllocationRequest> entity = new HttpEntity<>(allocationRequest, authHeaders());
         restTemplate.exchange(url, HttpMethod.POST, entity, String.class);
     }
 
+    @CircuitBreaker(name = "rentService")
+    @Retry(name = "rentService")
     public void endAllocation(String allocationId) {
         String url = rentApiUrl + "/api/v1/allocations/" + allocationId + "/end";
         HttpEntity<Void> entity = new HttpEntity<>(authHeaders());
         restTemplate.exchange(url, HttpMethod.POST, entity, String.class);
+    }
+
+    public List<AllocationDTO> getAllAllocationsFallback(Throwable t) {
+        return List.of();
     }
 }

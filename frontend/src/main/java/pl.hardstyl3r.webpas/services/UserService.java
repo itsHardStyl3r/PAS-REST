@@ -1,5 +1,7 @@
 package pl.hardstyl3r.webpas.services;
 
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+import io.github.resilience4j.retry.annotation.Retry;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
@@ -37,11 +39,15 @@ public class UserService {
         return headers;
     }
 
+    @CircuitBreaker(name = "userService")
+    @Retry(name = "userService")
     public void registerUser(RegisterRequest registerRequest) {
         String url = userApiUrl + "/api/v1/auth/register";
         restTemplate.postForEntity(url, registerRequest, String.class);
     }
 
+    @CircuitBreaker(name = "userService", fallbackMethod = "searchUsersFallback")
+    @Retry(name = "userService")
     public List<UserDTO> searchUsers(String searchTerm) {
         String url = userApiUrl + "/api/v1/user/search/" + searchTerm;
         HttpEntity<Void> entity = new HttpEntity<>(authHeaders());
@@ -52,5 +58,9 @@ public class UserService {
                 new ParameterizedTypeReference<>() {}
         );
         return response.getBody();
+    }
+
+    public List<UserDTO> searchUsersFallback(String searchTerm, Throwable t) {
+        return List.of();
     }
 }
