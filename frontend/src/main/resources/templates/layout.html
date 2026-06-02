@@ -67,6 +67,23 @@
                 <span th:text="#{menu.search_users}">Wyszukaj użytkownika</span>
             </a>
         </li>
+        <li class="nav-item" th:if="${authSession != null and authSession.authenticated}">
+            <span class="nav-link text-dark">
+                <i class="bi bi-person-circle pe-none me-2"></i>
+                <span th:text="${authSession.username}">user</span>
+            </span>
+        </li>
+        <li class="nav-item">
+            <a th:if="${authSession != null and authSession.authenticated}" th:href="@{/logout}" class="nav-link text-dark">
+                <i class="bi bi-box-arrow-right pe-none me-2"></i>
+                <span th:text="#{menu.logout}">Wyloguj</span>
+            </a>
+            <a th:unless="${authSession != null and authSession.authenticated}" th:href="@{/login}" class="nav-link"
+               th:classappend="${activeMenu == 'login' ? 'active' : 'text-dark'}">
+                <i class="bi bi-box-arrow-in-right pe-none me-2"></i>
+                <span th:text="#{menu.login}">Zaloguj</span>
+            </a>
+        </li>
     </ul>
 </div>
 

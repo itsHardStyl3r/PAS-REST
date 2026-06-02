@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout.html}" lang="pl">
+<head>
+    <title th:text="#{login.title}">Logowanie</title>
+</head>
+<body>
+
+<div layout:fragment="content">
+    <h1 th:text="#{login.title}">Logowanie</h1>
+
+    <div th:if="${loginError}" class="alert alert-danger" role="alert">
+        <span th:text="${loginError}">Błąd logowania</span>
+    </div>
+
+    <form th:action="@{/login}" th:object="${loginForm}" method="post" class="needs-validation" novalidate>
+        <div class="mb-3">
+            <label for="username" class="form-label" th:text="#{field.username}">Nazwa użytkownika:</label>
+            <input type="text" id="username" th:field="*{username}" class="form-control" required/>
+        </div>
+        <div class="mb-3">
+            <label for="password" class="form-label" th:text="#{field.password}">Hasło:</label>
+            <input type="password" id="password" th:field="*{password}" class="form-control" required/>
+        </div>
+        <button type="submit" class="btn btn-primary" th:text="#{login.submit}">Zaloguj</button>
+    </form>
+</div>
+
+<th:block layout:fragment="scripts">
+    <script>
+        (function () {
+            'use strict'
+            var forms = document.querySelectorAll('.needs-validation')
+            Array.prototype.slice.call(forms)
+                .forEach(function (form) {
+                    form.addEventListener('submit', function (event) {
+                        if (!form.checkValidity()) {
+                            event.preventDefault()
+                            event.stopPropagation()
+                        }
+                        form.classList.add('was-validated')
+                    }, false)
+                })
+        })()
+    </script>
+</th:block>
+
+</body>
+</html>

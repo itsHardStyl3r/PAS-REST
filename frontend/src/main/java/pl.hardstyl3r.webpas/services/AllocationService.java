@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import pl.hardstyl3r.webpas.dto.AllocationDTO;
 import pl.hardstyl3r.webpas.dto.AllocationRequest;
+import pl.hardstyl3r.webpas.security.AuthSession;
 
 import java.util.List;
 
@@ -17,45 +18,46 @@ import java.util.List;
 public class AllocationService {
 
     private final RestTemplate restTemplate;
-    private final String restApiUrl;
-    private final String apiToken;
+    private final String rentApiUrl;
+    private final AuthSession authSession;
 
     public AllocationService(RestTemplate restTemplate,
-                             @Value("${rest.api.base-url}") String restApiUrl,
-                             @Value("${rest.api.token}") String apiToken) {
+                             @Value("${rest.api.rent-base-url}") String rentApiUrl,
+                             AuthSession authSession) {
         this.restTemplate = restTemplate;
-        this.restApiUrl = restApiUrl;
-        this.apiToken = apiToken;
+        this.rentApiUrl = rentApiUrl;
+        this.authSession = authSession;
     }
 
-    private HttpHeaders createAuthHeaders() {
+    private HttpHeaders authHeaders() {
         HttpHeaders headers = new HttpHeaders();
-        headers.set("Authorization", "Bearer " + apiToken);
+        if (authSession.isAuthenticated()) {
+            headers.setBearerAuth(authSession.getToken());
+        }
         return headers;
     }
 
     public List<AllocationDTO> getAllAllocations() {
-        String url = restApiUrl + "/api/v1/allocations";
+        String url = rentApiUrl + "/api/v1/allocations";
+        HttpEntity<Void> entity = new HttpEntity<>(authHeaders());
         ResponseEntity<List<AllocationDTO>> response = restTemplate.exchange(
                 url,
                 HttpMethod.GET,
-                null,
+                entity,
                 new ParameterizedTypeReference<>() {}
         );
         return response.getBody();
     }
 
     public void createAllocation(AllocationRequest allocationRequest) {
-        String url = restApiUrl + "/api/v1/allocations";
-        HttpHeaders headers = createAuthHeaders();
-        HttpEntity<AllocationRequest> entity = new HttpEntity<>(allocationRequest, headers);
+        String url = rentApiUrl + "/api/v1/allocations";
+        HttpEntity<AllocationRequest> entity = new HttpEntity<>(allocationRequest, authHeaders());
         restTemplate.exchange(url, HttpMethod.POST, entity, String.class);
     }
 
     public void endAllocation(String allocationId) {
-        String url = restApiUrl + "/api/v1/allocations/" + allocationId + "/end";
-        HttpHeaders headers = createAuthHeaders();
-        HttpEntity<Void> entity = new HttpEntity<>(headers);
+        String url = rentApiUrl + "/api/v1/allocations/" + allocationId + "/end";
+        HttpEntity<Void> entity = new HttpEntity<>(authHeaders());
         restTemplate.exchange(url, HttpMethod.POST, entity, String.class);
     }
 }

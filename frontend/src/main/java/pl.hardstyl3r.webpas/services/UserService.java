@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import pl.hardstyl3r.webpas.dto.RegisterRequest;
 import pl.hardstyl3r.webpas.dto.UserDTO;
+import pl.hardstyl3r.webpas.security.AuthSession;
 
 import java.util.List;
 
@@ -17,31 +18,33 @@ import java.util.List;
 public class UserService {
 
     private final RestTemplate restTemplate;
-    private final String restApiUrl;
-    private final String apiToken;
+    private final String userApiUrl;
+    private final AuthSession authSession;
 
     public UserService(RestTemplate restTemplate,
-                       @Value("${rest.api.base-url}") String restApiUrl,
-                       @Value("${rest.api.token}") String apiToken) {
+                       @Value("${rest.api.user-base-url}") String userApiUrl,
+                       AuthSession authSession) {
         this.restTemplate = restTemplate;
-        this.restApiUrl = restApiUrl;
-        this.apiToken = apiToken;
+        this.userApiUrl = userApiUrl;
+        this.authSession = authSession;
     }
 
-    private HttpHeaders createAuthHeaders() {
+    private HttpHeaders authHeaders() {
         HttpHeaders headers = new HttpHeaders();
-        headers.set("Authorization", "Bearer " + apiToken);
+        if (authSession.isAuthenticated()) {
+            headers.setBearerAuth(authSession.getToken());
+        }
         return headers;
     }
 
     public void registerUser(RegisterRequest registerRequest) {
-        String url = restApiUrl + "/api/v1/auth/register";
+        String url = userApiUrl + "/api/v1/auth/register";
         restTemplate.postForEntity(url, registerRequest, String.class);
     }
 
     public List<UserDTO> searchUsers(String searchTerm) {
-        String url = restApiUrl + "/api/v1/user/search/" + searchTerm;
-        HttpEntity<Void> entity = new HttpEntity<>(createAuthHeaders());
+        String url = userApiUrl + "/api/v1/user/search/" + searchTerm;
+        HttpEntity<Void> entity = new HttpEntity<>(authHeaders());
         ResponseEntity<List<UserDTO>> response = restTemplate.exchange(
                 url,
                 HttpMethod.GET,
