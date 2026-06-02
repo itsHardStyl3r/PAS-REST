@@ -35,7 +35,7 @@ public class UserService {
     }
 
     public void registerUser(RegisterRequest registerRequest) {
-        String url = restApiUrl + "/api/auth/register";
+        String url = restApiUrl + "/api/v1/auth/register";
         restTemplate.postForEntity(url, registerRequest, String.class);
     }
 
