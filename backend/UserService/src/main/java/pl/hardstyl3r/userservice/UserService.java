@@ -6,6 +6,8 @@ import pl.hardstyl3r.userservice.domain.User;
 import pl.hardstyl3r.userservice.domain.UserRole;
 import pl.hardstyl3r.userservice.domain.exception.UserNotFoundException;
 import pl.hardstyl3r.userservice.domain.exception.UserValidationException;
+import pl.hardstyl3r.userservice.messaging.UserEventPublisher;
+import pl.hardstyl3r.userservice.messaging.event.UserRegisteredEvent;
 import pl.hardstyl3r.userservice.ports.driven.UserPort;
 import pl.hardstyl3r.userservice.ports.driving.UserViewPort;
 
@@ -16,10 +18,12 @@ import java.util.Optional;
 public class UserService implements UserViewPort {
     private final UserPort userPort;
     private final PasswordEncoder passwordEncoder;
+    private final UserEventPublisher eventPublisher;
 
-    public UserService(UserPort userPort, PasswordEncoder passwordEncoder) {
+    public UserService(UserPort userPort, PasswordEncoder passwordEncoder, UserEventPublisher eventPublisher) {
         this.userPort = userPort;
         this.passwordEncoder = passwordEncoder;
+        this.eventPublisher = eventPublisher;
     }
 
     @Override
@@ -27,7 +31,9 @@ public class UserService implements UserViewPort {
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         user.setRole(UserRole.CLIENT);
         user.setActive(false);
-        userPort.save(user);
+        User saved = userPort.save(user);
+        eventPublisher.publishUserRegistered(new UserRegisteredEvent(
+                saved.getId(), saved.getUsername(), saved.getName(), saved.getRole().name(), saved.isActive()));
     }
 
     @Override
