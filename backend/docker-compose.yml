@@ -10,6 +10,11 @@ services:
       MONGO_INITDB_DATABASE: pas_db
     volumes:
       - mongo-data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   rabbitmq:
     image: rabbitmq:3-management
@@ -20,6 +25,57 @@ services:
     environment:
       RABBITMQ_DEFAULT_USER: guest
       RABBITMQ_DEFAULT_PASS: guest
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  userservice:
+    build:
+      context: .
+      dockerfile: UserService/Dockerfile
+    container_name: userservice
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_DATA_MONGODB_URI: mongodb://root:passwd@mongodb:27017/pas_db?authSource=admin
+      RABBITMQ_HOST: rabbitmq
+    depends_on:
+      mongodb:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+
+  rentservice:
+    build:
+      context: .
+      dockerfile: RentService/Dockerfile
+    container_name: rentservice
+    ports:
+      - "8082:8082"
+    environment:
+      SPRING_DATA_MONGODB_URI: mongodb://root:passwd@mongodb:27017/rent_db?authSource=admin
+      RABBITMQ_HOST: rabbitmq
+    depends_on:
+      mongodb:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+
+  frontend:
+    build:
+      context: ../frontend
+      dockerfile: Dockerfile
+    container_name: frontend
+    ports:
+      - "8081:8081"
+    environment:
+      USER_API_URL: http://userservice:8080
+      RENT_API_URL: http://rentservice:8082
+    depends_on:
+      - userservice
+      - rentservice
 
 volumes:
   mongo-data:
