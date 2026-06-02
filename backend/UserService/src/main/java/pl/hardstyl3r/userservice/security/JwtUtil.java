@@ -2,20 +2,31 @@ package pl.hardstyl3r.userservice.security;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.security.Keys;
+import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.Resource;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
-import javax.crypto.SecretKey;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.security.KeyFactory;
+import java.security.PrivateKey;
+import java.security.PublicKey;
+import java.security.spec.PKCS8EncodedKeySpec;
+import java.security.spec.X509EncodedKeySpec;
+import java.util.Base64;
 import java.util.Date;
 import java.util.function.Function;
 
 @Component
 public class JwtUtil {
 
-    @Value("${jwt.secret}")
-    private String secret;
+    @Value("${jwt.private-key}")
+    private Resource privateKeyResource;
+
+    @Value("${jwt.public-key}")
+    private Resource publicKeyResource;
 
     @Value("${jwt.expiration.ms}")
     private long jwtExpirationMs;
@@ -23,8 +34,32 @@ public class JwtUtil {
     @Value("${jwt.refresh.expiration.ms}")
     private long jwtRefreshExpirationMs;
 
-    private SecretKey getSigningKey() {
-        return Keys.hmacShaKeyFor(secret.getBytes());
+    private PrivateKey privateKey;
+    private PublicKey publicKey;
+
+    @PostConstruct
+    void init() throws Exception {
+        this.privateKey = loadPrivateKey(privateKeyResource);
+        this.publicKey = loadPublicKey(publicKeyResource);
+    }
+
+    private PrivateKey loadPrivateKey(Resource resource) throws Exception {
+        byte[] der = readDer(resource, "PRIVATE KEY");
+        return KeyFactory.getInstance("RSA").generatePrivate(new PKCS8EncodedKeySpec(der));
+    }
+
+    private PublicKey loadPublicKey(Resource resource) throws Exception {
+        byte[] der = readDer(resource, "PUBLIC KEY");
+        return KeyFactory.getInstance("RSA").generatePublic(new X509EncodedKeySpec(der));
+    }
+
+    private byte[] readDer(Resource resource, String type) throws IOException {
+        String pem = new String(resource.getInputStream().readAllBytes(), StandardCharsets.UTF_8);
+        String base64 = pem
+                .replace("-----BEGIN " + type + "-----", "")
+                .replace("-----END " + type + "-----", "")
+                .replaceAll("\\s", "");
+        return Base64.getDecoder().decode(base64);
     }
 
     public String extractUsername(String token) {
@@ -38,7 +73,7 @@ public class JwtUtil {
 
     private Claims extractAllClaims(String token) {
         return Jwts.parser()
-                .verifyWith(getSigningKey())
+                .verifyWith(publicKey)
                 .build()
                 .parseSignedClaims(token)
                 .getPayload();
@@ -49,7 +84,7 @@ public class JwtUtil {
                 .subject(userDetails.getUsername())
                 .issuedAt(new Date(System.currentTimeMillis()))
                 .expiration(new Date(System.currentTimeMillis() + jwtExpirationMs))
-                .signWith(getSigningKey())
+                .signWith(privateKey)
                 .compact();
     }
 
@@ -58,7 +93,7 @@ public class JwtUtil {
                 .subject(userDetails.getUsername())
                 .issuedAt(new Date())
                 .expiration(new Date(System.currentTimeMillis() + jwtRefreshExpirationMs))
-                .signWith(getSigningKey())
+                .signWith(privateKey)
                 .compact();
     }
 
@@ -71,7 +106,7 @@ public class JwtUtil {
         return Jwts.builder()
                 .subject(value)
                 .issuedAt(new Date())
-                .signWith(getSigningKey())
+                .signWith(privateKey)
                 .compact();
     }
 
@@ -84,7 +119,7 @@ public class JwtUtil {
 
         try {
             String extractedValue = Jwts.parser()
-                    .verifyWith(getSigningKey())
+                    .verifyWith(publicKey)
                     .build()
                     .parseSignedClaims(cleanJws)
                     .getPayload()
